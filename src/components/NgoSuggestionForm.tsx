@@ -90,7 +90,7 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
                   <FormLabel className="text-lg">Medicine Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g., Unopened pack of Paracetamol 500mg, expires 12/2025. Pain relievers, fever reducers."
+                      placeholder="e.g., Unopened pack of Crocin 500mg, expires 12/2025. Pain relievers, fever reducers."
                       className="resize-y min-h-[100px]"
                       {...field}
                       aria-describedby="medicine-description-help"
@@ -112,7 +112,7 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <FormControl>
-                      <Input placeholder="e.g., Your City, State or Zip Code" {...field} className="pl-10" />
+                      <Input placeholder="e.g., Your City, State or Pincode" {...field} className="pl-10" />
                     </FormControl>
                   </div>
                   <FormDescription>

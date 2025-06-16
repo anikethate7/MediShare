@@ -34,10 +34,10 @@ export function NgoCard({ ngo }: NgoCardProps) {
         <div className="relative w-full h-48">
           <Image
             src={ngo.imageUrl || "https://placehold.co/600x400.png"}
-            alt={`${ngo.name} building or activity`}
+            alt={`${ngo.name} activity or premises`}
             layout="fill"
             objectFit="cover"
-            data-ai-hint="charity organization"
+            data-ai-hint={ngo['data-ai-hint'] || "charity organization"}
           />
         </div>
         <CardHeader className="pb-2">

@@ -11,4 +11,5 @@ export interface NGO {
   imageUrl?: string;
   operatingHours?: string;
   services: string[];
+  'data-ai-hint'?: string; // Added for more specific image placeholder hints
 }
