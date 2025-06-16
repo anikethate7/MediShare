@@ -127,10 +127,3 @@ export default function LoginNgoPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: 'NGO Login - MediShare',
-  description: 'Login to your NGO account on MediShare.',
-};
-
-    

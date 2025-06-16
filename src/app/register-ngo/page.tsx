@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, LogIn, UserPlus, Building, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react';
+import { Loader2, UserPlus, Building, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react';
 import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
@@ -305,10 +305,3 @@ export default function RegisterNgoPage() {
     </div>
   );
 }
-
-export const metadata = {
-  title: 'Register NGO - MediShare',
-  description: 'Create an account for your NGO on MediShare to connect with medicine donors.',
-};
-
-    
