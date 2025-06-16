@@ -29,7 +29,7 @@ import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
 import type { NGO } from '@/types';
-import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config'; // Import auth, db and firebaseInitError
+import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -80,7 +80,7 @@ export default function RegisterNgoPage() {
       toast({
         variant: 'destructive',
         title: 'Firebase Configuration Error',
-        description: firebaseInitError?.message || 'Firebase is not configured correctly. Please check the setup and .env.local file.',
+        description: firebaseInitError?.message || 'Firebase is not configured correctly. Please check the setup and .env file.',
         duration: 10000,
       });
       return;
@@ -112,21 +112,37 @@ export default function RegisterNgoPage() {
           });
           form.reset();
           router.push('/');
+        } else {
+           // This case should ideally not be reached if createUserWithEmailAndPassword succeeded without error.
+          console.error('Registration: Firebase user object is null after successful creation call.');
+          toast({
+            variant: 'destructive',
+            title: 'Registration Failed',
+            description: 'User creation seemed to succeed, but no user data was returned. Please try again.',
+            duration: 10000,
+          });
         }
       } catch (error: any) {
         console.error('Error registering NGO:', error);
+        let title = 'Registration Failed';
         let description = 'An unexpected error occurred. Please try again.';
+
         if (error.code === 'auth/email-already-in-use') {
-            description = 'This email address is already in use. Please use a different email or login.';
+          description = 'This email address is already in use. Please use a different email or login.';
         } else if (error.code === 'auth/weak-password') {
-            description = 'The password is too weak. Please choose a stronger password.';
-        } else {
-            description = error.message || 'An unexpected error occurred.';
+          description = 'The password is too weak. Please choose a stronger password.';
+        } else if (error.code === 'auth/configuration-not-found') {
+          title = 'Firebase Configuration Issue';
+          description = 'Registration failed. This usually means Email/Password sign-in is not enabled for your Firebase project, or the Project ID in your .env file is incorrect. Please check your Firebase project settings (Authentication > Sign-in method) and verify your .env file, then restart the server.';
+        } else if (error.message) {
+          description = error.message;
         }
+        
         toast({
           variant: 'destructive',
-          title: 'Registration Failed',
+          title: title,
           description: description,
+          duration: 10000, 
         });
       }
     });
@@ -354,3 +370,5 @@ export default function RegisterNgoPage() {
     </div>
   );
 }
+
+    
