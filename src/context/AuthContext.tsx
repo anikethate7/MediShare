@@ -6,14 +6,14 @@ import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/a
 import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import type { NGO } from '@/types';
-import { useToast } from '@/hooks/use-toast'; // Import useToast
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   currentUser: User | null;
   ngoProfile: NGO | null;
   loading: boolean;
   logout: () => Promise<void>;
-  isFirebaseConfigured: boolean; // Add this to indicate Firebase status
+  isFirebaseConfigured: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,27 +27,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (firebaseInitError) {
-      console.error("AuthContext: Firebase initialization failed.", firebaseInitError.message);
-      // Optionally notify user, but primary notification will be on login/register attempts
-      // toast({
-      //   variant: "destructive",
-      //   title: "Firebase Configuration Error",
-      //   description: "Firebase is not configured correctly. Authentication and database features will be unavailable. Please check console for details.",
-      //   duration: 10000,
-      // });
+      console.error("AuthContext: Firebase initialization failed due to configuration issues.", firebaseInitError.message);
+      // The config.ts already logs a more direct message to the console.
+      // Toast notifications for this specific issue are handled on pages attempting Firebase operations (login/register).
       setIsFirebaseConfigured(false);
       setLoading(false);
       return;
     }
     
     if (!firebaseAuth) {
-      console.error("AuthContext: Firebase Auth instance is not available even after successful init check. This is unexpected.");
+      // This case should ideally be caught by firebaseInitError if config was the issue.
+      // If firebaseAuth is null even after firebaseInitError is null, it's an unexpected state.
+      console.error("AuthContext: Firebase Auth instance is not available. Firebase might not be correctly initialized.");
       setIsFirebaseConfigured(false);
       setLoading(false);
       return;
     }
 
-    setIsFirebaseConfigured(true);
+    setIsFirebaseConfigured(true); // Firebase seems to be configured
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       setCurrentUser(user);
       if (user && firebaseDb) {
@@ -75,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, [toast]); // Added toast to dependency array as it's used in an effect-related catch block
 
   const logout = async () => {
     if (!isFirebaseConfigured || !firebaseAuth) {

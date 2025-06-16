@@ -25,7 +25,7 @@ if (
 ) {
   const errorMessage = "Firebase configuration is incomplete. Please ensure all NEXT_PUBLIC_FIREBASE_ environment variables (apiKey, authDomain, projectId, appId, etc.) are set correctly in your environment file (e.g., .env or .env.local) and restart your development server.";
   initializationError = new Error(errorMessage);
-  console.error(errorMessage);
+  console.error(errorMessage); // This line intentionally logs the error to the console
 } else {
   try {
     appInstance = !getApps().length ? initializeApp(firebaseConfigValues) : getApp();
@@ -35,6 +35,7 @@ if (
     const errorMessage = `Firebase initialization failed: ${err.message}. This often means your API key or other Firebase config values in your environment file are incorrect, or the Firebase project/app is not properly set up. Please verify your Firebase project settings and your environment file (e.g., .env or .env.local).`;
     initializationError = new Error(errorMessage);
     console.error(errorMessage, err);
+    // Ensure instances are null if initialization fails
     appInstance = null; 
     authInstance = null;
     dbInstance = null;
