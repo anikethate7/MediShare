@@ -79,7 +79,3 @@ export default function NgoDashboardPage() {
   );
 }
 
-export const metadata = {
-  title: 'NGO Dashboard - MediShare',
-  description: 'Manage your NGO profile and donation activities.',
-};
