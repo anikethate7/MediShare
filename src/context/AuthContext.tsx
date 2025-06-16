@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 import { User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
@@ -14,6 +14,7 @@ interface AuthContextType {
   loading: boolean;
   logout: () => Promise<void>;
   isFirebaseConfigured: boolean;
+  refreshNgoProfile: () => Promise<void>; // Added this
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -25,54 +26,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isFirebaseConfigured, setIsFirebaseConfigured] = useState(!firebaseInitError && !!firebaseAuth);
   const { toast } = useToast();
 
+  const fetchNgoProfile = useCallback(async (user: User | null) => {
+    if (user && firebaseDb) {
+      const ngoDocRef = doc(firebaseDb, 'ngos', user.uid);
+      try {
+        const ngoDocSnap = await getDoc(ngoDocRef);
+        if (ngoDocSnap.exists()) {
+          setNgoProfile({ uid: user.uid, ...ngoDocSnap.data() } as NGO);
+        } else {
+          setNgoProfile(null);
+          // console.warn("NGO profile not found for user:", user.uid);
+        }
+      } catch (error) {
+          console.error("Error fetching NGO profile:", error);
+          setNgoProfile(null);
+           toast({
+              variant: 'destructive',
+              title: 'Profile Error',
+              description: 'Could not fetch NGO profile.',
+          });
+      }
+    } else {
+      setNgoProfile(null);
+    }
+  }, [toast]);
+
+
   useEffect(() => {
     if (firebaseInitError) {
-      console.error("AuthContext: Firebase initialization failed due to configuration issues.", firebaseInitError.message);
-      // The config.ts already logs a more direct message to the console.
-      // Toast notifications for this specific issue are handled on pages attempting Firebase operations (login/register).
+      console.error("AuthContext: Firebase initialization failed.", firebaseInitError.message);
       setIsFirebaseConfigured(false);
       setLoading(false);
       return;
     }
     
     if (!firebaseAuth) {
-      // This case should ideally be caught by firebaseInitError if config was the issue.
-      // If firebaseAuth is null even after firebaseInitError is null, it's an unexpected state.
-      console.error("AuthContext: Firebase Auth instance is not available. Firebase might not be correctly initialized.");
+      console.error("AuthContext: Firebase Auth instance is not available.");
       setIsFirebaseConfigured(false);
       setLoading(false);
       return;
     }
 
-    setIsFirebaseConfigured(true); // Firebase seems to be configured
+    setIsFirebaseConfigured(true);
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
       setCurrentUser(user);
-      if (user && firebaseDb) {
-        const ngoDocRef = doc(firebaseDb, 'ngos', user.uid);
-        try {
-          const ngoDocSnap = await getDoc(ngoDocRef);
-          if (ngoDocSnap.exists()) {
-            setNgoProfile({ uid: user.uid, ...ngoDocSnap.data() } as NGO);
-          } else {
-            setNgoProfile(null);
-          }
-        } catch (error) {
-            console.error("Error fetching NGO profile:", error);
-            setNgoProfile(null);
-             toast({
-                variant: 'destructive',
-                title: 'Profile Error',
-                description: 'Could not fetch NGO profile.',
-            });
-        }
-      } else {
-        setNgoProfile(null);
-      }
+      await fetchNgoProfile(user);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [toast]); // Added toast to dependency array as it's used in an effect-related catch block
+  }, [toast, fetchNgoProfile]);
 
   const logout = async () => {
     if (!isFirebaseConfigured || !firebaseAuth) {
@@ -97,12 +100,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const refreshNgoProfile = useCallback(async () => {
+    if (currentUser) {
+        setLoading(true);
+        await fetchNgoProfile(currentUser);
+        setLoading(false);
+    }
+  }, [currentUser, fetchNgoProfile]);
+
+
   const value = {
     currentUser,
     ngoProfile,
     loading,
     logout,
     isFirebaseConfigured,
+    refreshNgoProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

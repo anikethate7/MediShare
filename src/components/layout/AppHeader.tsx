@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Search, Lightbulb, UserPlus, LogIn, LogOut, UserCircle } from 'lucide-react';
+import { HeartPulse, Search, Lightbulb, UserPlus, LogIn, LogOut, UserCircle, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -32,7 +32,6 @@ export function AppHeader() {
   };
 
   if (loading) {
-    // Optional: Add a loading state for the header or return a simplified header
     return (
       <header className="bg-card shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -73,18 +72,17 @@ export function AppHeader() {
           </Button>
           {currentUser ? (
             <>
-              {/* Optional: Add a link to an NGO dashboard if you create one */}
-              {/* <Button variant="ghost" size="sm" asChild>
+              <Button variant="ghost" size="sm" asChild>
                 <Link href="/ngo-dashboard" className="flex items-center gap-1.5 text-xs sm:text-sm">
-                  <UserCircle className="h-4 w-4 text-accent" />
+                  <LayoutDashboard className="h-4 w-4 text-accent" />
                   Dashboard
                 </Link>
-              </Button> */}
-              <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
-                <LogOut className="h-4 w-4 text-accent" />
-                Logout
               </Button>
-              {ngoProfile && <span className="text-xs text-muted-foreground hidden sm:inline">Welcome, {ngoProfile.name.split(' ')[0]}!</span>}
+              <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
+                <LogOut className="h-4 w-4 text-accent mr-0 sm:mr-1" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+              {ngoProfile && <span className="text-xs text-muted-foreground hidden lg:inline">Welcome, {ngoProfile.name.split(' ')[0]}!</span>}
             </>
           ) : (
             <>
