@@ -21,9 +21,9 @@ if (
   !firebaseConfigValues.apiKey ||
   !firebaseConfigValues.authDomain ||
   !firebaseConfigValues.projectId ||
-  !firebaseConfigValues.appId // appId is also crucial for initialization
+  !firebaseConfigValues.appId
 ) {
-  const errorMessage = "Firebase configuration is incomplete. Please ensure all NEXT_PUBLIC_FIREBASE_ environment variables (apiKey, authDomain, projectId, appId, etc.) are set correctly in your .env.local file and restart your development server.";
+  const errorMessage = "Firebase configuration is incomplete. Please ensure all NEXT_PUBLIC_FIREBASE_ environment variables (apiKey, authDomain, projectId, appId, etc.) are set correctly in your environment file (e.g., .env or .env.local) and restart your development server.";
   initializationError = new Error(errorMessage);
   console.error(errorMessage);
 } else {
@@ -32,10 +32,10 @@ if (
     authInstance = getAuth(appInstance);
     dbInstance = getFirestore(appInstance);
   } catch (err: any) {
-    const errorMessage = `Firebase initialization failed: ${err.message}. This often means your API key in .env.local is incorrect for the Firebase project, or the project/app is not properly set up. Please verify your Firebase project settings and .env.local file.`;
+    const errorMessage = `Firebase initialization failed: ${err.message}. This often means your API key or other Firebase config values in your environment file are incorrect, or the Firebase project/app is not properly set up. Please verify your Firebase project settings and your environment file (e.g., .env or .env.local).`;
     initializationError = new Error(errorMessage);
     console.error(errorMessage, err);
-    appInstance = null; // Ensure these are null on error
+    appInstance = null; 
     authInstance = null;
     dbInstance = null;
   }
