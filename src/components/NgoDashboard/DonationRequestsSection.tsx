@@ -37,12 +37,20 @@ export function DonationRequestsSection() {
         ...doc.data(),
       })) as DonationRequest[];
       setRequests(fetchedRequests);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching donation requests:', error);
+      let description = 'Could not load your donation requests. Please try again.';
+      if (error.code === 'firestore/permission-denied') {
+        description = 'Permission denied. Please check your Firestore security rules to allow reading donation requests for your NGO.';
+      } else if (error.message) {
+        // Use a more generic message if a specific one isn't available from the error object
+        description = `An error occurred: ${error.message}`;
+      }
       toast({
         variant: 'destructive',
         title: 'Error Fetching Requests',
-        description: 'Could not load your donation requests. Please try again.',
+        description: description,
+        duration: 10000, // Give more time to read potentially longer messages
       });
     } finally {
       setIsLoadingRequests(false);
@@ -72,12 +80,12 @@ export function DonationRequestsSection() {
           description: `Request status changed to ${newStatus}.`,
         });
         fetchRequests(); // Refresh the list
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error updating request status:', error);
         toast({
           variant: 'destructive',
           title: 'Update Failed',
-          description: 'Could not update the request status.',
+          description: error.message || 'Could not update the request status.',
         });
       }
     });
