@@ -1,8 +1,13 @@
+
 import type { NGO } from '@/types';
 
-export const mockNgos: NGO[] = [
+// Note: With Firebase integration, this mock data will primarily be for display if
+// Firestore data isn't fetched or if you want initial placeholders.
+// The 'id' here is a mock ID; in Firestore, the document ID will be the user's UID.
+
+export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to match potential local use before Firestore data
   {
-    id: '1',
+    id: '1', // This 'id' is for local mock data. Firestore will use UID.
     name: 'Asha Health Clinic',
     type: 'Medical Facility',
     address: '12 MG Road',
@@ -63,7 +68,7 @@ export const mockNgos: NGO[] = [
     name: 'Gram Swasthya Initiative',
     type: 'Medical Facility',
     address: '22 Rural Connect Rd',
-    city: 'Bangalore Rural', // Example for a more specific location
+    city: 'Bangalore Rural',
     description: 'Aims to improve healthcare access in rural areas. Runs mobile medical camps and accepts a wide range of essential medicines.',
     contactEmail: 'gramswasthya@gsi.in',
     website: 'https://gsi.example.in',

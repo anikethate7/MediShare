@@ -29,6 +29,10 @@ import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
 import type { NGO } from '@/types';
+import { auth, db } from '@/lib/firebase/config';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { doc, setDoc } from 'firebase/firestore';
+import { useRouter } from 'next/navigation';
 
 const registerNgoFormSchema = z.object({
   ngoName: z.string().min(3, 'NGO name must be at least 3 characters.').max(100, 'NGO name must not exceed 100 characters.'),
@@ -53,6 +57,7 @@ type RegisterNgoFormValues = z.infer<typeof registerNgoFormSchema>;
 export default function RegisterNgoPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<RegisterNgoFormValues>({
     resolver: zodResolver(registerNgoFormSchema),
@@ -72,14 +77,40 @@ export default function RegisterNgoPage() {
 
   async function onSubmit(data: RegisterNgoFormValues) {
     startTransition(async () => {
-      // Placeholder for actual registration logic
-      console.log('Registering NGO:', data);
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate API call
-      toast({
-        title: 'Registration Submitted (Simulated)',
-        description: 'Your NGO registration request has been received. This is a simulated response.',
-      });
-      form.reset();
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const user = userCredential.user;
+
+        if (user) {
+          const ngoData: Omit<NGO, 'id' | 'imageUrl' | 'operatingHours' | 'services' | 'data-ai-hint'> & { uid: string } = {
+            uid: user.uid,
+            name: data.ngoName,
+            type: data.ngoType,
+            address: data.address,
+            city: data.city,
+            description: data.description,
+            contactEmail: data.email, // Use the registration email as contact email by default
+            contactPhone: data.contactPhone,
+            website: data.website,
+          };
+          
+          await setDoc(doc(db, 'ngos', user.uid), ngoData);
+
+          toast({
+            title: 'Registration Successful!',
+            description: 'Your NGO account has been created.',
+          });
+          form.reset();
+          router.push('/'); // Redirect to homepage or a dashboard page
+        }
+      } catch (error: any) {
+        console.error('Error registering NGO:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Registration Failed',
+          description: error.message || 'An unexpected error occurred. Please try again.',
+        });
+      }
     });
   }
 

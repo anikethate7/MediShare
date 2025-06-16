@@ -19,6 +19,9 @@ import { Loader2, LogIn, Mail, KeyRound } from 'lucide-react';
 import React, { useTransition } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
+import { auth } from '@/lib/firebase/config';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
 
 const loginNgoFormSchema = z.object({
   email: z.string().email('Invalid email address.'),
@@ -30,6 +33,7 @@ type LoginNgoFormValues = z.infer<typeof loginNgoFormSchema>;
 export default function LoginNgoPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const router = useRouter();
 
   const form = useForm<LoginNgoFormValues>({
     resolver: zodResolver(loginNgoFormSchema),
@@ -41,14 +45,22 @@ export default function LoginNgoPage() {
 
   async function onSubmit(data: LoginNgoFormValues) {
     startTransition(async () => {
-      // Placeholder for actual login logic
-      console.log('Logging in NGO:', data);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      toast({
-        title: 'Login Attempted (Simulated)',
-        description: 'This is a simulated login response.',
-      });
-      // form.reset(); // Typically don't reset on failed login, but do on success
+      try {
+        await signInWithEmailAndPassword(auth, data.email, data.password);
+        toast({
+          title: 'Login Successful!',
+          description: 'Welcome back to MediShare.',
+        });
+        form.reset();
+        router.push('/'); // Redirect to homepage or a dashboard page
+      } catch (error: any) {
+        console.error('Error logging in NGO:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: error.message || 'Invalid email or password. Please try again.',
+        });
+      }
     });
   }
 
@@ -127,4 +139,3 @@ export default function LoginNgoPage() {
     </div>
   );
 }
-
