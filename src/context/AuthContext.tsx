@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setNgoProfile({ uid: user.uid, ...ngoDocSnap.data() } as NGO);
         } else {
           setNgoProfile(null);
-          // console.warn("NGO profile not found for user:", user.uid);
+          console.warn("NGO profile not found for user:", user.uid);
         }
       } catch (error) {
           console.error("Error fetching NGO profile:", error);
