@@ -1,4 +1,6 @@
 
+import type { Timestamp } from 'firebase/firestore';
+
 export interface NGO {
   id?: string; // This will be the Firebase Auth UID, so it might not be part of Firestore doc if UID is doc ID
   uid: string; // Firebase Auth User ID, will be the document ID in Firestore 'ngos' collection
@@ -14,4 +16,21 @@ export interface NGO {
   operatingHours?: string;
   services?: string[]; // Made optional as it's not in registration form initially
   'data-ai-hint'?: string;
+}
+
+export type DonationRequestStatus = 'Open' | 'Fulfilled' | 'Closed';
+export type UrgencyLevel = 'High' | 'Medium' | 'Low';
+
+export interface DonationRequest {
+  id?: string; // Firestore document ID
+  ngoUid: string;
+  ngoName: string;
+  medicineName: string;
+  description: string; // e.g., strength, type
+  quantityNeeded: string;
+  urgency: UrgencyLevel;
+  status: DonationRequestStatus;
+  notes?: string;
+  createdAt: Timestamp; // Firestore Timestamp
+  updatedAt: Timestamp; // Firestore Timestamp
 }
