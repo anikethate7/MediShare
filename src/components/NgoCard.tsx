@@ -1,10 +1,11 @@
+
 'use client';
 
 import Image from 'next/image';
 import type { NGO } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { MapPin, Building, Mail, Phone, Users, ShieldCheck, Globe } from 'lucide-react';
+import { MapPin, Building, Mail, Phone, Users, ShieldCheck, Globe, AlertTriangle, PawPrint } from 'lucide-react';
 import React, { useState } from 'react';
 import { SendOfferDialog } from './SendOfferDialog';
 import { Badge } from '@/components/ui/badge';
@@ -20,9 +21,9 @@ export function NgoCard({ ngo }: NgoCardProps) {
     switch (type) {
       case 'Medical Facility': return <ShieldCheck className="h-5 w-5 text-accent" />;
       case 'Community Health': return <Users className="h-5 w-5 text-accent" />;
-      case 'Disaster Relief': return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M12 12c-versorgungssicherheit-2.828 0-5-2.172-5-4.8s2.172-4.8 5-4.8 5 2.172 5 4.8-2.172 4.8-5 4.8zm0 0V21m0-9H3m9 0h9"></path><path d="M12 21a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 1 0 0 4.8z"></path><path d="M3 12a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 1 1 4.8 0z"></path><path d="M21 12a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 1 1 4.8 0z"></path></svg>; // Custom icon placeholder
+      case 'Disaster Relief': return <AlertTriangle className="h-5 w-5 text-accent" />;
       case 'General Welfare': return <Building className="h-5 w-5 text-accent" />;
-      case 'Animal Welfare': return <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-accent"><path d="M17.5 9.5C19.433 9.5 21 7.933 21 6C21 4.067 19.433 2.5 17.5 2.5C15.567 2.5 14 4.067 14 6C14 7.933 15.567 9.5 17.5 9.5Z"></path><path d="M8.5 18.5C10.433 18.5 12 16.933 12 15C12 13.067 10.433 11.5 8.5 11.5C6.567 11.5 5 13.067 5 15C5 16.933 6.567 18.5 8.5 18.5Z"></path><path d="M14 12L10.25 17.333C10.067 17.6 9.8 17.733 9.5 17.733C8.7 17.733 8.5 16.933 8.5 16.5V11.5L14 6V12Z"></path><path d="M21 12V15C21 18.333 18.333 21 15 21H9C5.667 21 3 18.333 3 15V9C3 5.667 5.667 3 9 3H12"></path></svg>; // Custom icon placeholder
+      case 'Animal Welfare': return <PawPrint className="h-5 w-5 text-accent" />;
       default: return <Building className="h-5 w-5 text-accent" />;
     }
   };

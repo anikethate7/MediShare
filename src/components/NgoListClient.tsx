@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -25,7 +26,7 @@ export function NgoListClient() {
     setTimeout(() => { // Simulate network delay
         setNgos(mockNgos);
         setIsLoading(false);
-    }, 500);
+    }, 100); // Reduced delay for faster perceived loading of mock data
   }, []);
 
 

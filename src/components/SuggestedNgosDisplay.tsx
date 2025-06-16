@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { SuggestNgosOutput } from '@/ai/flows/suggest-ngos';
@@ -50,7 +51,7 @@ export function SuggestedNgosDisplay({ suggestions, isLoading }: SuggestedNgosDi
       <CardContent>
         <ul className="space-y-3">
           {suggestions.suggestedNgos.map((ngoName, index) => (
-            <li key={index} className="p-3 bg-primary/5 border border-primary/20 rounded-md flex items-center gap-2">
+            <li key={index} className="p-3 bg-primary/5 border border-primary/20 rounded-md flex items-center gap-2 transition-colors hover:bg-primary/10">
               <CheckCircle2 className="h-5 w-5 text-accent flex-shrink-0" />
               <span className="text-foreground/90">{ngoName}</span>
             </li>
