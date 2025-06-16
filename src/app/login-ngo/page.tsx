@@ -19,7 +19,7 @@ import { Loader2, LogIn, Mail, KeyRound } from 'lucide-react';
 import React, { useTransition } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { auth } from '@/lib/firebase/config';
+import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config'; // Import auth and firebaseInitError
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
@@ -44,21 +44,39 @@ export default function LoginNgoPage() {
   });
 
   async function onSubmit(data: LoginNgoFormValues) {
+    if (firebaseInitError || !firebaseAuth) {
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Configuration Error',
+        description: firebaseInitError?.message || 'Firebase is not configured correctly. Please check the setup and .env.local file.',
+        duration: 10000,
+      });
+      return;
+    }
+
     startTransition(async () => {
       try {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        await signInWithEmailAndPassword(firebaseAuth, data.email, data.password);
         toast({
           title: 'Login Successful!',
           description: 'Welcome back to MediShare.',
         });
         form.reset();
-        router.push('/'); // Redirect to homepage or a dashboard page
+        router.push('/');
       } catch (error: any) {
         console.error('Error logging in NGO:', error);
+        let description = 'Invalid email or password. Please try again.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+          description = 'Incorrect email or password.';
+        } else if (error.code === 'auth/invalid-credential') {
+            description = 'Incorrect email or password.';
+        } else {
+          description = error.message || 'An unexpected error occurred.';
+        }
         toast({
           variant: 'destructive',
           title: 'Login Failed',
-          description: error.message || 'Invalid email or password. Please try again.',
+          description: description,
         });
       }
     });

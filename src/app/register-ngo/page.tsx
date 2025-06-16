@@ -29,7 +29,7 @@ import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
 import type { NGO } from '@/types';
-import { auth, db } from '@/lib/firebase/config';
+import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config'; // Import auth, db and firebaseInitError
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
@@ -76,9 +76,19 @@ export default function RegisterNgoPage() {
   });
 
   async function onSubmit(data: RegisterNgoFormValues) {
+    if (firebaseInitError || !firebaseAuth || !firebaseDb) {
+      toast({
+        variant: 'destructive',
+        title: 'Firebase Configuration Error',
+        description: firebaseInitError?.message || 'Firebase is not configured correctly. Please check the setup and .env.local file.',
+        duration: 10000,
+      });
+      return;
+    }
+
     startTransition(async () => {
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await createUserWithEmailAndPassword(firebaseAuth, data.email, data.password);
         const user = userCredential.user;
 
         if (user) {
@@ -89,26 +99,34 @@ export default function RegisterNgoPage() {
             address: data.address,
             city: data.city,
             description: data.description,
-            contactEmail: data.email, // Use the registration email as contact email by default
+            contactEmail: data.email,
             contactPhone: data.contactPhone,
             website: data.website,
           };
           
-          await setDoc(doc(db, 'ngos', user.uid), ngoData);
+          await setDoc(doc(firebaseDb, 'ngos', user.uid), ngoData);
 
           toast({
             title: 'Registration Successful!',
             description: 'Your NGO account has been created.',
           });
           form.reset();
-          router.push('/'); // Redirect to homepage or a dashboard page
+          router.push('/');
         }
       } catch (error: any) {
         console.error('Error registering NGO:', error);
+        let description = 'An unexpected error occurred. Please try again.';
+        if (error.code === 'auth/email-already-in-use') {
+            description = 'This email address is already in use. Please use a different email or login.';
+        } else if (error.code === 'auth/weak-password') {
+            description = 'The password is too weak. Please choose a stronger password.';
+        } else {
+            description = error.message || 'An unexpected error occurred.';
+        }
         toast({
           variant: 'destructive',
           title: 'Registration Failed',
-          description: error.message || 'An unexpected error occurred. Please try again.',
+          description: description,
         });
       }
     });
