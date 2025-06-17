@@ -2,14 +2,14 @@
 import type { Timestamp } from 'firebase/firestore';
 
 export interface NGO {
-  id?: string; // This will be the Firebase Auth UID, so it might not be part of Firestore doc if UID is doc ID
-  uid: string; // Firebase Auth User ID, will be the document ID in Firestore 'ngos' collection
+  id?: string; 
+  uid: string; 
   name: string;
   type: 'Medical Facility' | 'Community Health' | 'Disaster Relief' | 'General Welfare' | 'Animal Welfare';
   address: string;
   city: string;
   description: string;
-  contactEmail?: string; // Made consistently optional
+  contactEmail?: string; 
   contactPhone?: string;
   website?: string;
   imageUrl?: string;
@@ -22,15 +22,23 @@ export type DonationRequestStatus = 'Open' | 'Fulfilled' | 'Closed';
 export type UrgencyLevel = 'High' | 'Medium' | 'Low';
 
 export interface DonationRequest {
-  id?: string; // Firestore document ID
+  id?: string; 
   ngoUid: string;
-  ngoName: string; // Storing NGO name directly for quick display
+  ngoName: string; 
   medicineName: string;
-  description: string; // e.g., strength, type
+  description: string; 
   quantityNeeded: string;
   urgency: UrgencyLevel;
   status: DonationRequestStatus;
   notes?: string;
+  createdAt: Timestamp; 
+  updatedAt: Timestamp; 
+}
+
+export interface Donor {
+  uid: string; // Firebase Auth User ID, document ID in 'donors' collection
+  name: string;
+  email: string; // For reference, login is handled by Firebase Auth
+  role: 'donor'; // Explicitly set role
   createdAt: Timestamp; // Firestore Timestamp
-  updatedAt: Timestamp; // Firestore Timestamp
 }
