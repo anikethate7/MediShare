@@ -1,34 +1,28 @@
 
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react'; // Removed useEffect as it's no longer needed for mock data loading
 import { NgoCard } from './NgoCard';
 import { NgoFilterControls, NgoFilters } from './NgoFilterControls';
 import type { NGO } from '@/types';
 import { Frown } from 'lucide-react';
-import { mockNgos } from '@/data/mockData'; // Ensure this path is correct
+// Removed: import { mockNgos } from '@/data/mockData'; 
 
 const initialFilters: NgoFilters = {
   location: '',
   type: 'all',
 };
 
-export function NgoListClient() {
+interface NgoListClientProps {
+  initialNgos: NGO[]; // Define prop type
+}
+
+export function NgoListClient({ initialNgos }: NgoListClientProps) { 
   const [filters, setFilters] = useState<NgoFilters>(initialFilters);
-  const [ngos, setNgos] = useState<NGO[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [ngos, setNgos] = useState<NGO[]>(initialNgos); // Initialize ngos state with the prop
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Data is passed directly, so not initially loading
 
-  useEffect(() => {
-    // Simulate fetching data
-    setIsLoading(true);
-    // In a real app, you would fetch mockNgos or from an API
-    // For now, we directly use the imported mockNgos
-    setTimeout(() => { // Simulate network delay
-        setNgos(mockNgos);
-        setIsLoading(false);
-    }, 100); // Reduced delay for faster perceived loading of mock data
-  }, []);
-
+  // Removed useEffect that previously loaded mockNgos with setTimeout
 
   const filteredNgos = useMemo(() => {
     return ngos.filter((ngo) => {
@@ -49,7 +43,9 @@ export function NgoListClient() {
     setFilters(initialFilters);
   };
 
-  if (isLoading) {
+  // If initialNgos is empty (or for future async loading), isLoading might be true.
+  // For now, with mockNgos passed, this skeleton might not show unless isLoading is explicitly managed.
+  if (isLoading) { 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(6)].map((_, index) => (
@@ -71,7 +67,7 @@ export function NgoListClient() {
       {filteredNgos.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
           {filteredNgos.map((ngo) => (
-            <NgoCard key={ngo.id} ngo={ngo} />
+            <NgoCard key={ngo.id || ngo.uid} ngo={ngo} />
           ))}
         </div>
       ) : (

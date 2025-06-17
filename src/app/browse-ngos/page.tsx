@@ -1,5 +1,7 @@
+
 import { NgoListClient } from '@/components/NgoListClient';
 import { Search } from 'lucide-react';
+import { mockNgos } from '@/data/mockData'; // Import mockNgos
 
 export default function BrowseNgosPage() {
   return (
@@ -16,7 +18,7 @@ export default function BrowseNgosPage() {
         </p>
       </section>
       
-      <NgoListClient />
+      <NgoListClient initialNgos={mockNgos} /> {/* Pass mockNgos as prop */}
     </div>
   );
 }
