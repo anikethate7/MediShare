@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import type { DonationRequest, NGO } from '@/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -17,13 +17,13 @@ interface DonationRequestCardProps {
   fetchNgoDetails: (ngoUid: string) => Promise<NGO | null>; 
 }
 
-export function DonationRequestCard({ request, ngo: initialNgo, fetchNgoDetails }: DonationRequestCardProps) {
+const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetails }: DonationRequestCardProps) => {
   const [isSendOfferDialogOpen, setIsSendOfferDialogOpen] = useState(false);
   const [currentNgoDetails, setCurrentNgoDetails] = useState<NGO | null>(initialNgo);
   const [isLoadingNgo, setIsLoadingNgo] = useState(false);
   const { toast } = useToast();
 
-  const handleOfferHelp = async () => {
+  const handleOfferHelp = useCallback(async () => {
     if (currentNgoDetails) {
       setIsSendOfferDialogOpen(true);
       return;
@@ -52,7 +52,7 @@ export function DonationRequestCard({ request, ngo: initialNgo, fetchNgoDetails 
     } finally {
       setIsLoadingNgo(false);
     }
-  };
+  }, [currentNgoDetails, fetchNgoDetails, request.ngoUid, toast]);
 
   const getUrgencyBadgeVariant = (urgency: DonationRequest['urgency']) => {
     switch (urgency) {
@@ -122,3 +122,5 @@ export function DonationRequestCard({ request, ngo: initialNgo, fetchNgoDetails 
     </>
   );
 }
+
+export const DonationRequestCard = React.memo(DonationRequestCardComponent);

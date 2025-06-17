@@ -6,7 +6,7 @@ import type { NGO } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { MapPin, Building, Users, ShieldCheck, AlertTriangle, PawPrint, Loader2, Mail, Briefcase } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SendOfferDialog } from './SendOfferDialog';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +18,7 @@ interface NgoCardProps {
   ngo: NGO;
 }
 
-export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
+const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
   const [isSendOfferDialogOpen, setIsSendOfferDialogOpen] = useState(false);
   const [currentNgoDetails, setCurrentNgoDetails] = useState<NGO>(initialNgoData);
   const [isLoadingNgoDetails, setIsLoadingNgoDetails] = useState(false);
@@ -28,14 +28,14 @@ export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
     switch (type) {
       case 'Medical Facility': return <ShieldCheck className="h-5 w-5 text-primary" />;
       case 'Community Health': return <Users className="h-5 w-5 text-primary" />;
-      case 'Disaster Relief': return <AlertTriangle className="h-5 w-5 text-destructive" />; // Destructive color for relief
+      case 'Disaster Relief': return <AlertTriangle className="h-5 w-5 text-destructive" />;
       case 'General Welfare': return <Building className="h-5 w-5 text-primary" />;
-      case 'Animal Welfare': return <PawPrint className="h-5 w-5 text-green-600" />; // Specific color for animal welfare
+      case 'Animal Welfare': return <PawPrint className="h-5 w-5 text-green-600" />;
       default: return <Building className="h-5 w-5 text-primary" />;
     }
   };
 
-  const handleViewContact = async () => {
+  const handleViewContact = useCallback(async () => {
     if (initialNgoData.uid && firebaseDb && (!initialNgoData.contactEmail && !initialNgoData.contactPhone)) {
         setIsLoadingNgoDetails(true);
         try {
@@ -46,13 +46,13 @@ export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
                 setIsSendOfferDialogOpen(true);
             } else {
                 toast({ title: "NGO details not found", variant: "destructive" });
-                setCurrentNgoDetails(initialNgoData);
+                setCurrentNgoDetails(initialNgoData); // Fallback to initial data
                 setIsSendOfferDialogOpen(true);
             }
         } catch (error) {
             console.error("Error fetching NGO details:", error);
             toast({ title: "Error fetching NGO details", variant: "destructive" });
-            setCurrentNgoDetails(initialNgoData);
+            setCurrentNgoDetails(initialNgoData); 
             setIsSendOfferDialogOpen(true); 
         } finally {
             setIsLoadingNgoDetails(false);
@@ -61,7 +61,7 @@ export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
         setCurrentNgoDetails(initialNgoData); 
         setIsSendOfferDialogOpen(true);
     }
-  };
+  }, [initialNgoData, toast]);
 
 
   return (
@@ -75,6 +75,8 @@ export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
             objectFit="cover"
             data-ai-hint={currentNgoDetails['data-ai-hint'] || "charity organization"}
             className="group-hover:scale-105 transition-transform duration-300"
+            priority={false} // Defer loading for offscreen images
+            loading="lazy"   // Defer loading for offscreen images
           />
         </div>
         <CardHeader className="pb-2">
@@ -129,3 +131,5 @@ export function NgoCard({ ngo: initialNgoData }: NgoCardProps) {
     </>
   );
 }
+
+export const NgoCard = React.memo(NgoCardComponent);

@@ -1,11 +1,11 @@
 
 'use client';
 
-import React, { useState, useEffect, useCallback, useTransition } from 'react';
+import React, { useState, useEffect, useCallback, useTransition, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { CreateDonationRequestForm } from './CreateDonationRequestForm';
+// import { CreateDonationRequestForm } from './CreateDonationRequestForm'; // Original import
 import { ViewDonationRequests } from './ViewDonationRequests';
 import { useAuth } from '@/context/AuthContext';
 import type { DonationRequest } from '@/types';
@@ -13,6 +13,10 @@ import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { Inbox, PlusCircle, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+const CreateDonationRequestForm = React.lazy(() =>
+  import('./CreateDonationRequestForm').then(module => ({ default: module.CreateDonationRequestForm }))
+);
 
 export function DonationRequestsSection() {
   const { currentUser, ngoProfile } = useAuth();
@@ -42,15 +46,16 @@ export function DonationRequestsSection() {
       let description = 'Could not load your donation requests. Please try again.';
       if (error.code === 'firestore/permission-denied') {
         description = 'Permission denied. Please check your Firestore security rules to allow reading donation requests for your NGO.';
+      } else if (error.code === 'failed-precondition') {
+        description = "A Firestore index is missing. Check your browser's developer console (F12) for a Firebase link to create it.";
       } else if (error.message) {
-        // Use a more generic message if a specific one isn't available from the error object
         description = `An error occurred: ${error.message}`;
       }
       toast({
         variant: 'destructive',
         title: 'Error Fetching Requests',
         description: description,
-        duration: 10000, // Give more time to read potentially longer messages
+        duration: 10000,
       });
     } finally {
       setIsLoadingRequests(false);
@@ -61,12 +66,12 @@ export function DonationRequestsSection() {
     fetchRequests();
   }, [fetchRequests]);
 
-  const handleRequestCreated = () => {
+  const handleRequestCreated = useCallback(() => {
     setIsCreateDialogOpen(false);
     fetchRequests(); // Refresh the list
-  };
+  }, [fetchRequests]);
 
-  const handleUpdateStatus = async (requestId: string, newStatus: DonationRequest['status']) => {
+  const handleUpdateStatus = useCallback(async (requestId: string, newStatus: DonationRequest['status']) => {
     if (!firebaseDb) return;
     startUpdateTransition(async () => {
       try {
@@ -89,7 +94,7 @@ export function DonationRequestsSection() {
         });
       }
     });
-  };
+  }, [fetchRequests, toast]);
 
   return (
     <Card className="mt-6 shadow-lg">
@@ -109,13 +114,15 @@ export function DonationRequestsSection() {
               <PlusCircle className="mr-2 h-5 w-5" /> Create New Request
             </Button>
           </DialogTrigger>
-          {ngoProfile && currentUser && (
-            <CreateDonationRequestForm
-              ngoUid={currentUser.uid}
-              ngoName={ngoProfile.name}
-              onSuccess={handleRequestCreated}
-              onCancel={() => setIsCreateDialogOpen(false)}
-            />
+          {isCreateDialogOpen && ngoProfile && currentUser && (
+            <Suspense fallback={<div className="p-6 text-center"><Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" /></div>}>
+              <CreateDonationRequestForm
+                ngoUid={currentUser.uid}
+                ngoName={ngoProfile.name}
+                onSuccess={handleRequestCreated}
+                onCancel={() => setIsCreateDialogOpen(false)}
+              />
+            </Suspense>
           )}
         </Dialog>
       </CardHeader>

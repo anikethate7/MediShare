@@ -1,12 +1,11 @@
 
 'use client';
 
-import React, { useState, useMemo } from 'react'; // Removed useEffect as it's no longer needed for mock data loading
+import React, { useState, useMemo, useCallback } from 'react';
 import { NgoCard } from './NgoCard';
 import { NgoFilterControls, NgoFilters } from './NgoFilterControls';
 import type { NGO } from '@/types';
 import { Frown } from 'lucide-react';
-// Removed: import { mockNgos } from '@/data/mockData'; 
 
 const initialFilters: NgoFilters = {
   location: '',
@@ -14,15 +13,13 @@ const initialFilters: NgoFilters = {
 };
 
 interface NgoListClientProps {
-  initialNgos: NGO[]; // Define prop type
+  initialNgos: NGO[];
 }
 
 export function NgoListClient({ initialNgos }: NgoListClientProps) { 
   const [filters, setFilters] = useState<NgoFilters>(initialFilters);
-  const [ngos, setNgos] = useState<NGO[]>(initialNgos); // Initialize ngos state with the prop
-  const [isLoading, setIsLoading] = useState<boolean>(false); // Data is passed directly, so not initially loading
-
-  // Removed useEffect that previously loaded mockNgos with setTimeout
+  const [ngos, setNgos] = useState<NGO[]>(initialNgos);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const filteredNgos = useMemo(() => {
     return ngos.filter((ngo) => {
@@ -35,16 +32,14 @@ export function NgoListClient({ initialNgos }: NgoListClientProps) {
     });
   }, [ngos, filters]);
 
-  const handleFilterChange = (newFilters: NgoFilters) => {
+  const handleFilterChange = useCallback((newFilters: NgoFilters) => {
     setFilters(newFilters);
-  };
+  }, []);
   
-  const resetFilters = () => {
+  const resetFilters = useCallback(() => {
     setFilters(initialFilters);
-  };
+  }, []);
 
-  // If initialNgos is empty (or for future async loading), isLoading might be true.
-  // For now, with mockNgos passed, this skeleton might not show unless isLoading is explicitly managed.
   if (isLoading) { 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -59,7 +54,6 @@ export function NgoListClient({ initialNgos }: NgoListClientProps) {
       </div>
     );
   }
-
 
   return (
     <div>
