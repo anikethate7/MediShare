@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Handshake, Building, ArrowRight } from 'lucide-react';
+import { Handshake, Building, ArrowRight, UserCircle, Heart } from 'lucide-react';
 
 export default function HomePage() {
   return (
@@ -22,17 +22,17 @@ export default function HomePage() {
         <Card className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
           <CardHeader className="text-center">
             <div className="mx-auto bg-accent/10 p-4 rounded-full w-fit mb-4">
-              <Handshake className="h-12 w-12 text-accent" />
+              <Heart className="h-12 w-12 text-accent" />
             </div>
             <CardTitle className="text-3xl font-headline text-accent">Are you a Donor?</CardTitle>
             <CardDescription className="text-md text-foreground/70 pt-2">
-              View active medicine requests from NGOs and find out how you can help.
+              Login or register to view active medicine requests from NGOs and offer your help.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
             <Button asChild size="lg" className="w-full md:w-auto bg-accent hover:bg-accent/90 text-lg py-6">
-              <Link href="/donor">
-                View Donation Requests <ArrowRight className="ml-2 h-5 w-5" />
+              <Link href="/login-donor">
+                Donor Portal <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </CardContent>
