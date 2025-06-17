@@ -77,15 +77,6 @@ export default function DonorDashboardPage() {
           
           setRequests(fetchedRequests);
 
-          const uniqueNgoUids = Array.from(new Set(fetchedRequests.map(req => req.ngoUid)));
-          const ngoPromises = uniqueNgoUids.map(uid => {
-            if (!ngosData[uid]) {
-              return fetchNgoDetails(uid);
-            }
-            return Promise.resolve(ngosData[uid]);
-          });
-          await Promise.all(ngoPromises);
-
         } catch (err: any) {
           console.error('Error fetching open donation requests:', err);
           let uiErrorText = 'Could not load donation requests. Please try again later.';
@@ -124,7 +115,7 @@ export default function DonorDashboardPage() {
     } else if (!authLoading && !currentUser) {
       setIsLoadingRequests(false);
     }
-  }, [currentUser, userRole, authLoading, toast, fetchNgoDetails, ngosData]);
+  }, [currentUser, userRole, authLoading, toast]); // Removed fetchNgoDetails and ngosData from dependencies
 
   if (authLoading || (!currentUser && !authLoading && !donorProfile)) {
     return (

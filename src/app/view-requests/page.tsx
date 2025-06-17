@@ -63,15 +63,6 @@ export default function ViewRequestsPage() {
         
         setRequests(fetchedRequests);
 
-        const uniqueNgoUids = Array.from(new Set(fetchedRequests.map(req => req.ngoUid)));
-        const ngoPromises = uniqueNgoUids.map(uid => {
-          if (!ngosData[uid]) { 
-            return fetchNgoDetails(uid);
-          }
-          return Promise.resolve(ngosData[uid]);
-        });
-        await Promise.all(ngoPromises);
-
       } catch (err: any) {
         console.error('Error fetching open donation requests:', err);
         let uiErrorText = 'Could not load donation requests. Please try again later.';
@@ -106,7 +97,7 @@ export default function ViewRequestsPage() {
     };
 
     fetchOpenRequests();
-  }, [toast, fetchNgoDetails, ngosData]); 
+  }, [toast]); // Removed fetchNgoDetails and ngosData from dependencies
 
   return (
     <div className="space-y-8 animate-fade-in">
