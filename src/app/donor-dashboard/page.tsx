@@ -12,7 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function DonorDashboardPage() {
-  const { currentUser, userRole, loading: authLoading } = useAuth();
+  const { currentUser, userRole, donorProfile, loading: authLoading } = useAuth();
   const router = useRouter();
   const [requests, setRequests] = useState<DonationRequest[]>([]);
   const [ngosData, setNgosData] = useState<Record<string, NGO>>({});
@@ -122,7 +122,7 @@ export default function DonorDashboardPage() {
     }
   }, [currentUser, userRole, authLoading, toast, fetchNgoDetails, ngosData]);
 
-  if (authLoading || (!currentUser && !authLoading)) {
+  if (authLoading || (!currentUser && !authLoading && !donorProfile)) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -154,7 +154,7 @@ export default function DonorDashboardPage() {
           Donor Dashboard
         </h1>
         <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-          Welcome, Donor! Browse active medicine needs from NGOs. Your contribution can make a difference.
+          Welcome, {donorProfile?.name || 'Donor'}! Browse active medicine needs from NGOs. Your contribution can make a difference.
         </p>
       </section>
 
@@ -198,3 +198,4 @@ export default function DonorDashboardPage() {
     </div>
   );
 }
+
