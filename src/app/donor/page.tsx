@@ -5,13 +5,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, doc, getDoc } from 'firebase/firestore';
 import type { DonationRequest, NGO } from '@/types';
-import { Loader2, ListChecks, Frown, AlertTriangle } from 'lucide-react';
+import { Loader2, ListChecks, Frown, AlertTriangle, HandHeart } from 'lucide-react';
 import { DonationRequestCard } from '@/components/DonationRequestCard';
 import { useToast } from '@/hooks/use-toast';
 
-// This page is now secondary to /donor for viewing requests.
-// It can be kept for admin purposes or a direct link, but /donor is the primary user-facing page.
-export default function ViewRequestsPage() {
+export default function DonorPage() {
   const [requests, setRequests] = useState<DonationRequest[]>([]);
   const [ngosData, setNgosData] = useState<Record<string, NGO>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +50,7 @@ export default function ViewRequestsPage() {
         const requestsQuery = query(
           collection(firebaseDb, 'donationRequests'),
           where('status', '==', 'Open'),
-          orderBy('urgency', 'asc'), 
+          orderBy('urgency', 'asc'),
           orderBy('createdAt', 'desc')
         );
         const querySnapshot = await getDocs(requestsQuery);
@@ -65,7 +63,7 @@ export default function ViewRequestsPage() {
 
         const uniqueNgoUids = Array.from(new Set(fetchedRequests.map(req => req.ngoUid)));
         const ngoPromises = uniqueNgoUids.map(uid => {
-          if (!ngosData[uid]) { 
+          if (!ngosData[uid]) {
             return fetchNgoDetails(uid);
           }
           return Promise.resolve(ngosData[uid]);
@@ -101,19 +99,19 @@ export default function ViewRequestsPage() {
     };
 
     fetchOpenRequests();
-  }, [toast, fetchNgoDetails, ngosData]); 
+  }, [toast, fetchNgoDetails, ngosData]);
 
   return (
     <div className="space-y-8 animate-fade-in">
       <section className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-6 mx-auto w-fit">
-          <ListChecks className="h-12 w-12 text-primary" />
+        <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-6 mx-auto w-fit">
+          <HandHeart className="h-12 w-12 text-accent" />
         </div>
-        <h1 className="text-4xl font-headline font-bold mb-2 text-primary">
-          All Active Donation Requests (Legacy View)
+        <h1 className="text-4xl font-headline font-bold mb-2 text-accent">
+          Active Donation Requests
         </h1>
         <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-          This page shows current needs from NGOs. For the primary donor view, please see "View Requests" in the header.
+          Browse current medicine needs from NGOs. Your contribution can make a significant difference!
         </p>
       </section>
 
@@ -138,7 +136,7 @@ export default function ViewRequestsPage() {
           <Frown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-foreground/80">No Open Requests</h3>
           <p className="text-muted-foreground mt-2 max-w-md mx-auto">
-            There are currently no open donation requests. Check back later!
+            There are currently no open donation requests. Thank you for checking!
           </p>
         </div>
       )}
@@ -149,8 +147,8 @@ export default function ViewRequestsPage() {
             <DonationRequestCard
               key={request.id}
               request={request}
-              ngo={ngosData[request.ngoUid] || null} 
-              fetchNgoDetails={fetchNgoDetails} 
+              ngo={ngosData[request.ngoUid] || null}
+              fetchNgoDetails={fetchNgoDetails}
             />
           ))}
         </div>
@@ -160,6 +158,6 @@ export default function ViewRequestsPage() {
 }
 
 export const metadata = {
-  title: 'Legacy - Active Donation Requests - MediShare',
-  description: 'Browse and respond to current medicine donation needs from NGOs.',
+  title: 'Donate Medicine - View Active NGO Requests - MediShare',
+  description: 'Browse and respond to current medicine donation needs from NGOs. Make a difference with MediShare.',
 };

@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Search, Lightbulb, UserPlus, LogIn, LogOut, LayoutDashboard, ListChecks } from 'lucide-react';
+import { HeartPulse, Search, UserPlus, LogIn, LogOut, LayoutDashboard, ListChecks, HandHeart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,8 @@ export function AppHeader() {
     }
   };
 
-  if (loading) {
+  // Display a minimal loading state for the header itself
+  if (loading && typeof window !== 'undefined') { // Check window to avoid SSR issues if loading state is initially true
     return (
       <header className="bg-card shadow-md sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -40,8 +41,7 @@ export function AppHeader() {
             <h1 className="text-2xl font-headline font-bold">MediShare</h1>
           </Link>
           <div className="animate-pulse flex items-center gap-1 sm:gap-2">
-            <div className="h-7 w-20 bg-muted rounded-md"></div>
-            <div className="h-7 w-20 bg-muted rounded-md"></div>
+            <div className="h-7 w-24 bg-muted rounded-md"></div>
             <div className="h-7 w-28 bg-muted rounded-md"></div>
             <div className="h-7 w-24 bg-muted rounded-md"></div>
           </div>
@@ -49,6 +49,7 @@ export function AppHeader() {
       </header>
     );
   }
+
 
   return (
     <header className="bg-card shadow-md sticky top-0 z-50">
@@ -59,9 +60,9 @@ export function AppHeader() {
         </Link>
         <nav className="flex items-center gap-1 sm:gap-2">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/" className="flex items-center gap-1.5 text-xs sm:text-sm">
-              <Lightbulb className="h-4 w-4 text-accent" />
-              Suggest
+            <Link href="/donor" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <HandHeart className="h-4 w-4 text-accent" />
+              View Requests
             </Link>
           </Button>
           <Button variant="ghost" size="sm" asChild>
@@ -70,12 +71,7 @@ export function AppHeader() {
               Browse NGOs
             </Link>
           </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/view-requests" className="flex items-center gap-1.5 text-xs sm:text-sm">
-              <ListChecks className="h-4 w-4 text-accent" />
-              Active Requests
-            </Link>
-          </Button>
+          
           {currentUser ? (
             <>
               <Button variant="ghost" size="sm" asChild>
