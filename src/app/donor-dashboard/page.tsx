@@ -87,21 +87,26 @@ export default function DonorDashboardPage() {
           await Promise.all(ngoPromises);
 
         } catch (err: any) {
-          console.error('Error fetching open donation requests:', err);
+          console.error('Error fetching open donation requests:', err); // This console.error IS the place you should look for the link.
+          let uiErrorText = 'Could not load donation requests. Please try again later.';
           let toastTitle = 'Error Fetching Requests';
-          let toastDescription = 'Could not load donation requests. Please try again later.';
+          let toastDescription = uiErrorText;
           let toastDuration = 10000;
 
           if (err.code === 'failed-precondition') {
             toastTitle = 'Database Index Required';
-            toastDescription = "The query requires an index. Check Firestore indexing. The console might have a link to create it.";
-            toastDuration = 15000;
+            toastDescription = "A Firestore index is missing. Please check your browser's developer console for a link to create it.";
+            uiErrorText = "Action Required: A Firestore database index is missing. Please open your browser's developer console (usually by pressing F12 or right-clicking -> Inspect -> Console). Look for an error message from Firebase that includes a direct link to create the required index in the Firebase Console. Click that link to resolve this.";
+            toastDuration = 20000; // Longer duration for this important message
           } else if (err.code === 'permission-denied') {
-            toastDescription = "You don't have permission to view these requests. Check Firestore security rules.";
+            toastTitle = 'Permission Denied';
+            uiErrorText = "You don't have permission to view these requests. Please check your Firestore security rules.";
+            toastDescription = uiErrorText;
           } else {
-            toastDescription = err.message || toastDescription;
+            uiErrorText = err.message || uiErrorText;
+            toastDescription = uiErrorText;
           }
-          setError(toastDescription); // Set the error state for UI display
+          setError(uiErrorText);
           toast({
               variant: 'destructive',
               title: toastTitle,
@@ -114,10 +119,9 @@ export default function DonorDashboardPage() {
       };
       fetchOpenRequests();
     } else if (!authLoading && currentUser && userRole !== 'donor') {
-      // If user is logged in but not a donor (e.g. NGO), don't load requests for this page
       setIsLoadingRequests(false);
     } else if (!authLoading && !currentUser) {
-      setIsLoadingRequests(false); // Not logged in, do nothing
+      setIsLoadingRequests(false);
     }
   }, [currentUser, userRole, authLoading, toast, fetchNgoDetails, ngosData]);
 
@@ -130,7 +134,6 @@ export default function DonorDashboardPage() {
   }
   
   if (userRole !== 'donor') {
-    // This case should be handled by redirection, but as a fallback:
      return (
       <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-center">
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
@@ -168,7 +171,7 @@ export default function DonorDashboardPage() {
         <div className="flex flex-col items-center justify-center py-12 text-center bg-destructive/10 p-6 rounded-lg">
           <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-destructive mb-2">Could Not Load Requests</h3>
-          <p className="text-destructive/80 max-w-md mx-auto">{error}</p>
+          <p className="text-destructive/80 max-w-md mx-auto whitespace-pre-line">{error}</p>
         </div>
       )}
 
