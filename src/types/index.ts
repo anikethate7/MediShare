@@ -9,12 +9,12 @@ export interface NGO {
   address: string;
   city: string;
   description: string;
-  contactEmail?: string;
+  contactEmail?: string; // Made consistently optional
   contactPhone?: string;
   website?: string;
   imageUrl?: string;
   operatingHours?: string;
-  services?: string[]; // Made optional as it's not in registration form initially
+  services?: string[];
   'data-ai-hint'?: string;
 }
 
@@ -24,7 +24,7 @@ export type UrgencyLevel = 'High' | 'Medium' | 'Low';
 export interface DonationRequest {
   id?: string; // Firestore document ID
   ngoUid: string;
-  ngoName: string;
+  ngoName: string; // Storing NGO name directly for quick display
   medicineName: string;
   description: string; // e.g., strength, type
   quantityNeeded: string;

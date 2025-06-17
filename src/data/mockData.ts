@@ -4,10 +4,12 @@ import type { NGO } from '@/types';
 // Note: With Firebase integration, this mock data will primarily be for display if
 // Firestore data isn't fetched or if you want initial placeholders.
 // The 'id' here is a mock ID; in Firestore, the document ID will be the user's UID.
+// Added 'uid' to each mock NGO to align with potential usage where UID is expected.
 
-export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to match potential local use before Firestore data
+export const mockNgos: NGO[] = [
   {
-    id: '1', // This 'id' is for local mock data. Firestore will use UID.
+    id: 'mock1',
+    uid: 'mock-uid-asha-health',
     name: 'Asha Health Clinic',
     type: 'Medical Facility',
     address: '12 MG Road',
@@ -22,7 +24,8 @@ export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to ma
     'data-ai-hint': 'indian clinic'
   },
   {
-    id: '2',
+    id: 'mock2',
+    uid: 'mock-uid-seva-community',
     name: 'Seva Community Centre',
     type: 'Community Health',
     address: '45 Gandhi Nagar',
@@ -36,7 +39,8 @@ export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to ma
     'data-ai-hint': 'community center india'
   },
   {
-    id: '3',
+    id: 'mock3',
+    uid: 'mock-uid-sahayata-relief',
     name: 'Sahayata Disaster Relief',
     type: 'Disaster Relief',
     address: '78 Relief Marg',
@@ -50,7 +54,8 @@ export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to ma
     'data-ai-hint': 'disaster relief india'
   },
   {
-    id: '4',
+    id: 'mock4',
+    uid: 'mock-uid-manav-kalyan',
     name: 'Manav Kalyan Sanstha',
     type: 'General Welfare',
     address: '101 Karuna Lane',
@@ -64,7 +69,8 @@ export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to ma
     'data-ai-hint': 'welfare organization india'
   },
   {
-    id: '5',
+    id: 'mock5',
+    uid: 'mock-uid-gram-swasthya',
     name: 'Gram Swasthya Initiative',
     type: 'Medical Facility',
     address: '22 Rural Connect Rd',
@@ -78,7 +84,8 @@ export const mockNgos: Omit<NGO, 'uid'>[] & {id: string}[] = [ // Adjusted to ma
     'data-ai-hint': 'rural healthcare india'
   },
   {
-    id: '6',
+    id: 'mock6',
+    uid: 'mock-uid-jeev-raksha',
     name: 'Jeev Raksha Animal Care',
     type: 'Animal Welfare',
     address: '33 Prakriti Vihar',

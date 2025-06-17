@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Search, Lightbulb, UserPlus, LogIn, LogOut, UserCircle, LayoutDashboard } from 'lucide-react';
+import { HeartPulse, Search, Lightbulb, UserPlus, LogIn, LogOut, LayoutDashboard, ListChecks } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -67,7 +67,13 @@ export function AppHeader() {
           <Button variant="ghost" size="sm" asChild>
             <Link href="/browse-ngos" className="flex items-center gap-1.5 text-xs sm:text-sm">
               <Search className="h-4 w-4 text-accent" />
-              Browse
+              Browse NGOs
+            </Link>
+          </Button>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/view-requests" className="flex items-center gap-1.5 text-xs sm:text-sm">
+              <ListChecks className="h-4 w-4 text-accent" />
+              Active Requests
             </Link>
           </Button>
           {currentUser ? (
