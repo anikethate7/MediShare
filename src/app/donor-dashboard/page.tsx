@@ -22,12 +22,14 @@ export default function DonorDashboardPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading) {
+    if (!authLoading) { // Only act once auth state is resolved
       if (!currentUser) {
-        router.push('/login-donor');
+        router.push('/login-donor'); // Not logged in, send to login
       } else if (userRole === 'ngo') {
-        router.push('/ngo-dashboard');
+        router.push('/ngo-dashboard'); // Logged in as NGO, redirect to NGO dash
       }
+      // If userRole is 'donor', they can stay.
+      // If userRole is null but currentUser exists, the content rendering logic below will show Access Denied.
     }
   }, [currentUser, userRole, authLoading, router]);
 
@@ -52,7 +54,8 @@ export default function DonorDashboardPage() {
   }, [ngosData]);
 
   useEffect(() => {
-    if (currentUser && userRole === 'donor') {
+    // Fetch requests only if the user is confirmed to be a donor and auth is not loading.
+    if (!authLoading && currentUser && userRole === 'donor') {
       const fetchOpenRequests = async () => {
         if (!firebaseDb) {
           setError("Database not configured. Please contact support.");
@@ -87,12 +90,12 @@ export default function DonorDashboardPage() {
           if (err.code === 'failed-precondition') {
             setIsIndexError(true);
             toastTitle = 'Database Index Required';
-            toastDescription = "A Firestore index is missing for querying donation requests. Please check your browser's developer console (usually F12 -> Console tab) for a direct link from Firebase to create it. Click that link to resolve this issue.";
+            toastDescription = "A Firestore index is missing. Check your browser's developer console (F12) for a Firebase link to create it.";
             uiErrorText = "Action Required: A Firestore database index is missing.\n\nTo view donation requests, a specific index needs to be created in your Firebase Firestore database.\n\n1. Open your browser's developer console (usually by pressing F12 or right-clicking -> Inspect -> Console).\n2. Look for an error message starting with 'FirebaseError: The query requires an index...'.\n3. This error message will contain a direct link. Click this link to go to the Firebase Console and create the missing index.\n\nAfter the index is built (which may take a few minutes), refresh this page.";
-            toastDuration = 20000; 
+            toastDuration = 20000;
           } else if (err.code === 'permission-denied') {
             toastTitle = 'Permission Denied';
-            uiErrorText = "You don't have permission to view these requests. Please check your Firestore security rules.";
+            uiErrorText = "You don't have permission to view these requests. Check Firestore rules.";
             toastDescription = uiErrorText;
           } else {
             uiErrorText = err.message || uiErrorText;
@@ -110,14 +113,14 @@ export default function DonorDashboardPage() {
         }
       };
       fetchOpenRequests();
-    } else if (!authLoading && currentUser && userRole !== 'donor') {
-      setIsLoadingRequests(false);
-    } else if (!authLoading && !currentUser) {
+    } else if (!authLoading && (!currentUser || userRole !== 'donor')) {
+      // If auth is done, but no user or not a donor, don't attempt to load requests.
       setIsLoadingRequests(false);
     }
-  }, [currentUser, userRole, authLoading, toast]); // Removed fetchNgoDetails and ngosData from dependencies
+  }, [currentUser, userRole, authLoading, toast]);
 
-  if (authLoading || (!currentUser && !authLoading && !donorProfile)) {
+  // Primary loading state for the entire page based on AuthContext
+  if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
         <Loader2 className="h-16 w-16 animate-spin text-primary" />
@@ -125,19 +128,20 @@ export default function DonorDashboardPage() {
     );
   }
   
-  if (userRole !== 'donor') {
+  // After auth loading, if user is not a donor (or no user, though redirect should catch this)
+  if (!currentUser || userRole !== 'donor') {
      return (
       <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-center">
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold text-destructive mb-2">Access Denied</h1>
         <p className="text-muted-foreground">
-          This dashboard is for donors.
+          This dashboard is for registered donors only.
         </p>
       </div>
     );
   }
 
-
+  // If execution reaches here, user is a donor. Proceed to render dashboard content.
   return (
     <div className="space-y-8 animate-fade-in">
       <section className="text-center">
@@ -148,7 +152,7 @@ export default function DonorDashboardPage() {
           Donor Dashboard
         </h1>
         <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
-          Welcome, {donorProfile?.name || 'Donor'}! Browse active medicine needs from NGOs. Your contribution can make a difference.
+          Welcome, {donorProfile?.name || 'Donor'}! Browse active medicine needs from NGOs.
         </p>
       </section>
 

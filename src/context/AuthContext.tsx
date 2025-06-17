@@ -12,13 +12,13 @@ export type UserRole = 'donor' | 'ngo' | null;
 
 interface AuthContextType {
   currentUser: User | null;
-  ngoProfile: NGO | null; 
-  donorProfile: Donor | null; // Added donorProfile
+  ngoProfile: NGO | null;
+  donorProfile: Donor | null;
   userRole: UserRole;
-  loading: boolean;
+  loading: boolean; // True while checking auth state OR fetching profile
   logout: () => Promise<void>;
   isFirebaseConfigured: boolean;
-  refreshUserProfile: () => Promise<void>; // Renamed for clarity
+  refreshUserProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,44 +26,79 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [ngoProfile, setNgoProfile] = useState<NGO | null>(null);
-  const [donorProfile, setDonorProfile] = useState<Donor | null>(null); // New state for donor profile
+  const [donorProfile, setDonorProfile] = useState<Donor | null>(null);
   const [userRole, setUserRole] = useState<UserRole>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Initialize to true
   const [isFirebaseConfigured, setIsFirebaseConfigured] = useState(!firebaseInitError && !!firebaseAuth);
   const { toast } = useToast();
 
-  const fetchUserProfileAndSetRole = useCallback(async (user: User | null) => {
-    setNgoProfile(null); // Reset profiles
-    setDonorProfile(null);
-    setUserRole(null);
+  // Effect for handling Firebase auth state changes
+  useEffect(() => {
+    if (firebaseInitError) {
+      console.error("AuthContext: Firebase initialization failed.", firebaseInitError.message);
+      setIsFirebaseConfigured(false);
+      setLoading(false);
+      return;
+    }
+    if (!firebaseAuth) {
+      console.error("AuthContext: Firebase Auth instance is not available.");
+      setIsFirebaseConfigured(false);
+      setLoading(false);
+      return;
+    }
 
-    if (user && firebaseDb) {
+    setIsFirebaseConfigured(true);
+    setLoading(true); // Set loading true when starting to listen for auth state
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+      setCurrentUser(user);
+      // Profile fetching and role setting will be handled by the next useEffect
+      // setLoading will be set to false there.
+    });
+    return () => unsubscribe();
+  }, []); // Runs once on mount
+
+  // Effect for fetching user profile and setting role when currentUser changes
+  useEffect(() => {
+    const fetchProfileAndSetRole = async (userToFetchProfileFor: User) => {
+      setLoading(true); // Start loading for profile fetch
+      setNgoProfile(null);
+      setDonorProfile(null);
+      setUserRole(null);
+
+      if (!firebaseDb) {
+        console.error("AuthContext: Firestore DB instance is not available for profile fetch.");
+        setLoading(false);
+        return;
+      }
+
       // Try to fetch NGO profile
-      const ngoDocRef = doc(firebaseDb, 'ngos', user.uid);
+      const ngoDocRef = doc(firebaseDb, 'ngos', userToFetchProfileFor.uid);
       try {
         const ngoDocSnap = await getDoc(ngoDocRef);
         if (ngoDocSnap.exists()) {
-          setNgoProfile({ uid: user.uid, ...ngoDocSnap.data() } as NGO);
+          setNgoProfile({ uid: userToFetchProfileFor.uid, ...ngoDocSnap.data() } as NGO);
           setUserRole('ngo');
+          setLoading(false);
           return; // Found NGO profile, role set, exit
         }
       } catch (error) {
-          console.error("Error fetching NGO profile:", error);
-           toast({
-              variant: 'destructive',
-              title: 'Profile Error',
-              description: 'Could not fetch NGO profile information.',
-          });
-          // Do not return yet, try fetching donor profile
+        console.error("Error fetching NGO profile:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Profile Error',
+          description: 'Could not fetch NGO profile information.',
+        });
+        // Continue to check for donor profile
       }
 
       // If not an NGO, try to fetch Donor profile
-      const donorDocRef = doc(firebaseDb, 'donors', user.uid);
+      const donorDocRef = doc(firebaseDb, 'donors', userToFetchProfileFor.uid);
       try {
         const donorDocSnap = await getDoc(donorDocRef);
         if (donorDocSnap.exists()) {
-          setDonorProfile({ uid: user.uid, ...donorDocSnap.data()} as Donor);
+          setDonorProfile({ uid: userToFetchProfileFor.uid, ...donorDocSnap.data() } as Donor);
           setUserRole('donor');
+          setLoading(false);
           return; // Found Donor profile, role set, exit
         }
       } catch (error) {
@@ -75,43 +110,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
       
-      // If no specific profile found after checking both, user is authenticated but has no specific role document.
-      // This could be a user who registered but profile creation failed, or an admin, or other future role.
-      // For now, if they are authenticated but no specific profile, what should be the role?
-      // Let's keep it null for now, or you might decide to default to 'donor'.
-      if (user && !ngoProfile && !donorProfile) {
-        console.warn("User is authenticated but no NGO or Donor profile document found for UID:", user.uid);
-        // setUserRole('donor'); // Optional: default to donor if no profile found
-      }
+      // If no specific profile found after checking both
+      console.warn("User is authenticated but no NGO or Donor profile document found for UID:", userToFetchProfileFor.uid);
+      setLoading(false); // Finish loading
+    };
 
-    }
-  }, [toast, ngoProfile, donorProfile]); // Added donorProfile to dependencies
-
-
-  useEffect(() => {
-    if (firebaseInitError) {
-      console.error("AuthContext: Firebase initialization failed.", firebaseInitError.message);
-      setIsFirebaseConfigured(false);
+    if (currentUser) {
+      fetchProfileAndSetRole(currentUser);
+    } else {
+      // No user logged in, reset profiles, role, and finish loading
+      setNgoProfile(null);
+      setDonorProfile(null);
+      setUserRole(null);
       setLoading(false);
-      return;
     }
-    
-    if (!firebaseAuth) {
-      console.error("AuthContext: Firebase Auth instance is not available.");
-      setIsFirebaseConfigured(false);
-      setLoading(false);
-      return;
-    }
-
-    setIsFirebaseConfigured(true);
-    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
-      setCurrentUser(user);
-      await fetchUserProfileAndSetRole(user); // This now checks for both NGO and Donor profiles
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [fetchUserProfileAndSetRole]);
+  }, [currentUser, toast]); // Dependencies: currentUser and toast
 
   const logout = async () => {
     if (!isFirebaseConfigured || !firebaseAuth) {
@@ -125,35 +138,71 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     try {
       await firebaseSignOut(firebaseAuth);
-      // State updates (currentUser, profiles, userRole to null) will be handled by onAuthStateChanged
+      // currentUser will become null via onAuthStateChanged, triggering profile reset
     } catch (error: any) {
-        console.error("Error during logout:", error);
-        toast({
-            variant: "destructive",
-            title: "Logout Error",
-            description: error.message || "Failed to logout. Please try again.",
-        });
+      console.error("Error during logout:", error);
+      toast({
+        variant: "destructive",
+        title: "Logout Error",
+        description: error.message || "Failed to logout. Please try again.",
+      });
     }
   };
 
   const refreshUserProfile = useCallback(async () => {
     if (currentUser) {
+        // Re-trigger the profile fetching logic by effectively doing what the second useEffect does
+        // This is a direct invocation of similar logic for clarity in refresh
         setLoading(true);
-        await fetchUserProfileAndSetRole(currentUser);
+        setNgoProfile(null);
+        setDonorProfile(null);
+        setUserRole(null);
+
+        if (!firebaseDb) {
+            console.error("AuthContext: Firestore DB instance is not available for profile refresh.");
+            setLoading(false);
+            return;
+        }
+
+        // Try NGO
+        const ngoDocRef = doc(firebaseDb, 'ngos', currentUser.uid);
+        try {
+            const ngoDocSnap = await getDoc(ngoDocRef);
+            if (ngoDocSnap.exists()) {
+                setNgoProfile({ uid: currentUser.uid, ...ngoDocSnap.data() } as NGO);
+                setUserRole('ngo');
+                setLoading(false);
+                return;
+            }
+        } catch (error) { console.error("Refresh NGO Profile Error:", error); }
+
+        // Try Donor
+        const donorDocRef = doc(firebaseDb, 'donors', currentUser.uid);
+        try {
+            const donorDocSnap = await getDoc(donorDocRef);
+            if (donorDocSnap.exists()) {
+                setDonorProfile({ uid: currentUser.uid, ...donorDocSnap.data() } as Donor);
+                setUserRole('donor');
+                setLoading(false);
+                return;
+            }
+        } catch (error) { console.error("Refresh Donor Profile Error:", error); }
+        
+        console.warn("Refresh: No NGO or Donor profile found for UID:", currentUser.uid);
         setLoading(false);
     }
-  }, [currentUser, fetchUserProfileAndSetRole]);
+  }, [currentUser, firebaseDb]); // Removed toast as direct dependency to avoid re-creating if toast object changes
 
 
   const value = {
     currentUser,
     ngoProfile,
-    donorProfile, // Provide donorProfile
+    donorProfile,
     userRole,
     loading,
     logout,
     isFirebaseConfigured,
-    refreshUserProfile, // Renamed function
+    refreshUserProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
