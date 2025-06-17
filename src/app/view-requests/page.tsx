@@ -97,7 +97,7 @@ export default function ViewRequestsPage() {
     };
 
     fetchOpenRequests();
-  }, [toast]); // Removed fetchNgoDetails and ngosData from dependencies
+  }, [toast]); 
 
   return (
     <div className="space-y-8 animate-fade-in">
@@ -161,7 +161,9 @@ export default function ViewRequestsPage() {
   );
 }
 
-export const metadata = {
-  title: 'Legacy - Active Donation Requests - MediShare',
-  description: 'Browse and respond to current medicine donation needs from NGOs.',
-};
+// Removed metadata export as it's not allowed in client components
+// export const metadata = {
+//   title: 'Legacy - Active Donation Requests - MediShare',
+//   description: 'Browse and respond to current medicine donation needs from NGOs.',
+// };
+
