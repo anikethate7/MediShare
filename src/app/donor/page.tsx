@@ -157,7 +157,4 @@ export default function DonorPage() {
   );
 }
 
-export const metadata = {
-  title: 'Donate Medicine - View Active NGO Requests - MediShare',
-  description: 'Browse and respond to current medicine donation needs from NGOs. Make a difference with MediShare.',
-};
+// Removed metadata export
