@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, doc, getDoc } from 'firebase/firestore';
 import type { DonationRequest, NGO } from '@/types';
-import { Loader2, ListChecks, Frown, AlertTriangle, LayoutDashboard } from 'lucide-react';
+import { Loader2, Frown, AlertTriangle, LayoutDashboard } from 'lucide-react';
 import { DonationRequestCard } from '@/components/DonationRequestCard';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
@@ -22,14 +22,12 @@ export default function DonorDashboardPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (!authLoading) { // Only act once auth state is resolved
+    if (!authLoading) { 
       if (!currentUser) {
-        router.push('/login-donor'); // Not logged in, send to login
+        router.push('/login-donor'); 
       } else if (userRole === 'ngo') {
-        router.push('/ngo-dashboard'); // Logged in as NGO, redirect to NGO dash
+        router.push('/ngo-dashboard'); 
       }
-      // If userRole is 'donor', they can stay.
-      // If userRole is null but currentUser exists, the content rendering logic below will show Access Denied.
     }
   }, [currentUser, userRole, authLoading, router]);
 
@@ -54,7 +52,6 @@ export default function DonorDashboardPage() {
   }, [ngosData]);
 
   useEffect(() => {
-    // Fetch requests only if the user is confirmed to be a donor and auth is not loading.
     if (!authLoading && currentUser && userRole === 'donor') {
       const fetchOpenRequests = async () => {
         if (!firebaseDb) {
@@ -114,34 +111,30 @@ export default function DonorDashboardPage() {
       };
       fetchOpenRequests();
     } else if (!authLoading && (!currentUser || userRole !== 'donor')) {
-      // If auth is done, but no user or not a donor, don't attempt to load requests.
       setIsLoadingRequests(false);
     }
   }, [currentUser, userRole, authLoading, toast]);
 
-  // Primary loading state for the entire page based on AuthContext
   if (authLoading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
-        <Loader2 className="h-16 w-16 animate-spin text-primary" />
+        <Loader2 className="h-16 w-16 animate-spin text-accent" />
       </div>
     );
   }
   
-  // After auth loading, if user is not a donor (or no user, though redirect should catch this)
   if (!currentUser || userRole !== 'donor') {
      return (
-      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-center">
+      <div className="flex flex-col justify-center items-center min-h-[calc(100vh-200px)] text-center p-6">
         <AlertTriangle className="h-16 w-16 text-destructive mb-4" />
         <h1 className="text-2xl font-semibold text-destructive mb-2">Access Denied</h1>
         <p className="text-muted-foreground">
-          This dashboard is for registered donors only.
+          This dashboard is for registered donors only. Please log in as a donor.
         </p>
       </div>
     );
   }
 
-  // If execution reaches here, user is a donor. Proceed to render dashboard content.
   return (
     <div className="space-y-8 animate-fade-in">
       <section className="text-center">

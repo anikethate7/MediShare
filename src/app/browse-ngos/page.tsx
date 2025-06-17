@@ -1,14 +1,14 @@
 
 import { NgoListClient } from '@/components/NgoListClient';
-import { Search } from 'lucide-react';
-import { mockNgos } from '@/data/mockData'; // Import mockNgos
+import { SearchCode } from 'lucide-react'; // Changed Search to SearchCode for a different visual
+import { mockNgos } from '@/data/mockData'; 
 
 export default function BrowseNgosPage() {
   return (
-    <div className="space-y-8">
-      <section className="text-center animate-fade-in">
+    <div className="space-y-8 animate-fade-in">
+      <section className="text-center">
         <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-6">
-          <Search className="h-12 w-12 text-primary" />
+          <SearchCode className="h-12 w-12 text-primary" />
         </div>
         <h1 className="text-4xl font-headline font-bold mb-4 text-primary">
           Discover NGOs Near You
@@ -18,7 +18,7 @@ export default function BrowseNgosPage() {
         </p>
       </section>
       
-      <NgoListClient initialNgos={mockNgos} /> {/* Pass mockNgos as prop */}
+      <NgoListClient initialNgos={mockNgos} />
     </div>
   );
 }

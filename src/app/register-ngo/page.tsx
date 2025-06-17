@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, UserPlus, Building, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react';
+import { Loader2, UserPlus, Building2, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react'; // Changed Building to Building2
 import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
@@ -99,7 +99,7 @@ export default function RegisterNgoPage() {
             address: data.address,
             city: data.city,
             description: data.description,
-            contactEmail: data.email,
+            contactEmail: data.email, // Store email in profile as well
             contactPhone: data.contactPhone,
             website: data.website,
           };
@@ -108,12 +108,11 @@ export default function RegisterNgoPage() {
 
           toast({
             title: 'Registration Successful!',
-            description: 'Your NGO account has been created.',
+            description: 'Your NGO account has been created. Please login.',
           });
           form.reset();
-          router.push('/');
+          router.push('/login-ngo'); // Redirect to NGO login
         } else {
-           // This case should ideally not be reached if createUserWithEmailAndPassword succeeded without error.
           console.error('Registration: Firebase user object is null after successful creation call.');
           toast({
             variant: 'destructive',
@@ -171,7 +170,7 @@ export default function RegisterNgoPage() {
                     <FormLabel>NGO Name</FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Building className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input placeholder="e.g., Hope Foundation" {...field} className="pl-10" />
                       </div>
                     </FormControl>
@@ -350,7 +349,7 @@ export default function RegisterNgoPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90" disabled={isPending}>
+              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -370,5 +369,3 @@ export default function RegisterNgoPage() {
     </div>
   );
 }
-
-    

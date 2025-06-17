@@ -2,14 +2,14 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Search, UserPlus, LogIn, LogOut, LayoutDashboard, ListChecks, HandHeart, UserCircle, Building } from 'lucide-react';
+import { HeartPulse, Search, LogOut, LayoutDashboard, HandHeart, UserCircle, Building2, UserPlus2 } from 'lucide-react'; // Changed Building to Building2
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 
 export function AppHeader() {
-  const { currentUser, userRole, ngoProfile, logout, loading } = useAuth();
+  const { currentUser, userRole, ngoProfile, donorProfile, logout, loading } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -51,8 +51,8 @@ export function AppHeader() {
               My Dashboard
             </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
-            <LogOut className="h-4 w-4 text-accent mr-0 sm:mr-1" />
+          <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm border-accent text-accent hover:bg-accent/10 hover:text-accent">
+            <LogOut className="h-4 w-4 mr-0 sm:mr-1" />
             <span className="hidden sm:inline">Logout</span>
           </Button>
           {ngoProfile && <span className="text-xs text-muted-foreground hidden lg:inline">Welcome, {ngoProfile.name.split(' ')[0]}!</span>}
@@ -75,10 +75,11 @@ export function AppHeader() {
               Browse NGOs
             </Link>
           </Button>
-          <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm">
-            <LogOut className="h-4 w-4 text-accent mr-0 sm:mr-1" />
+           <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs sm:text-sm border-accent text-accent hover:bg-accent/10 hover:text-accent">
+            <LogOut className="h-4 w-4 mr-0 sm:mr-1" />
             <span className="hidden sm:inline">Logout</span>
           </Button>
+          {donorProfile && <span className="text-xs text-muted-foreground hidden lg:inline">Welcome, {donorProfile.name.split(' ')[0]}!</span>}
         </>
       );
     }
@@ -98,16 +99,16 @@ export function AppHeader() {
             Browse NGOs
           </Link>
         </Button>
-        <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm">
+        <Button variant="outline" size="sm" asChild className="text-xs sm:text-sm text-accent border-accent hover:bg-accent/10 hover:text-accent">
           <Link href="/login-donor" className="flex items-center gap-1.5">
-            <UserCircle className="h-4 w-4 text-accent" />
+            <UserCircle className="h-4 w-4" />
             Donor Login
           </Link>
         </Button>
         <Button variant="default" size="sm" asChild className="text-xs sm:text-sm bg-primary hover:bg-primary/90">
           <Link href="/login-ngo" className="flex items-center gap-1.5">
-            <Building className="h-4 w-4" />
-            NGO Login
+            <Building2 className="h-4 w-4" />
+            NGO Login/Register
           </Link>
         </Button>
       </>

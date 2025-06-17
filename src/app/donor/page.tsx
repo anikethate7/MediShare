@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, doc, getDoc } from 'firebase/firestore';
 import type { DonationRequest, NGO } from '@/types';
-import { Loader2, HandHeart, Frown, AlertTriangle } from 'lucide-react';
+import { Loader2, HandHeart, Frown, AlertTriangle, ListChecks } from 'lucide-react';
 import { DonationRequestCard } from '@/components/DonationRequestCard';
 import { useToast } from '@/hooks/use-toast';
 
@@ -97,15 +97,15 @@ export default function DonorPage() {
     };
 
     fetchOpenRequests();
-  }, [toast]); // Removed fetchNgoDetails and ngosData from dependencies to prevent loops
+  }, [toast]); 
 
   return (
     <div className="space-y-8 animate-fade-in">
       <section className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-6 mx-auto w-fit">
-          <HandHeart className="h-12 w-12 text-accent" />
+        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-6 mx-auto w-fit">
+          <ListChecks className="h-12 w-12 text-primary" />
         </div>
-        <h1 className="text-4xl font-headline font-bold mb-2 text-accent">
+        <h1 className="text-4xl font-headline font-bold mb-2 text-primary">
           Active Donation Requests
         </h1>
         <p className="text-lg text-foreground/80 max-w-2xl mx-auto">

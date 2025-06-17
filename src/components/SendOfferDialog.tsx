@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -10,7 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import type { NGO } from '@/types';
-import { Mail, Phone, Copy, ExternalLink, Building } from 'lucide-react';
+import { Mail, Phone, Copy, ExternalLink, Building2 } from 'lucide-react'; // Changed Building to Building2
 import { useToast } from '@/hooks/use-toast';
 
 interface SendOfferDialogProps {
@@ -45,7 +46,7 @@ export function SendOfferDialog({ ngo, isOpen, onOpenChange }: SendOfferDialogPr
       <DialogContent className="sm:max-w-[480px] bg-card rounded-lg shadow-xl">
         <DialogHeader className="mb-4">
           <DialogTitle className="text-2xl font-headline text-primary flex items-center gap-2">
-            <Building className="h-6 w-6 text-accent" />
+            <Building2 className="h-6 w-6 text-primary" /> 
             Contact {ngo.name}
           </DialogTitle>
           <DialogDescription className="text-foreground/80">
@@ -55,7 +56,7 @@ export function SendOfferDialog({ ngo, isOpen, onOpenChange }: SendOfferDialogPr
         
         <div className="space-y-4 py-4">
           {ngo.contactEmail && (
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-accent" />
                 <a href={`mailto:${ngo.contactEmail}`} className="text-primary hover:underline truncate" title={ngo.contactEmail}>
@@ -68,7 +69,7 @@ export function SendOfferDialog({ ngo, isOpen, onOpenChange }: SendOfferDialogPr
             </div>
           )}
           {ngo.contactPhone && (
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
                <div className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-accent" />
                 <span className="text-foreground truncate" title={ngo.contactPhone}>{ngo.contactPhone}</span>
@@ -79,7 +80,7 @@ export function SendOfferDialog({ ngo, isOpen, onOpenChange }: SendOfferDialogPr
             </div>
           )}
           {ngo.website && (
-            <div className="flex items-center justify-between p-3 bg-muted rounded-md">
+            <div className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
               <div className="flex items-center gap-3">
                 <ExternalLink className="h-5 w-5 text-accent" />
                  <a href={ngo.website} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline truncate" title={ngo.website}>
@@ -88,8 +89,8 @@ export function SendOfferDialog({ ngo, isOpen, onOpenChange }: SendOfferDialogPr
               </div>
             </div>
           )}
-          {!ngo.contactEmail && !ngo.contactPhone && (
-            <p className="text-muted-foreground text-center">No direct contact information available. Please check their website if available.</p>
+          {!ngo.contactEmail && !ngo.contactPhone && !ngo.website && (
+            <p className="text-muted-foreground text-center p-3 bg-muted/50 rounded-md">Contact information not available for this NGO.</p>
           )}
         </div>
 

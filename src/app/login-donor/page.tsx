@@ -62,7 +62,7 @@ export default function LoginDonorPage() {
           description: 'Welcome back to MediShare.',
         });
         form.reset();
-        router.push('/donor-dashboard'); // Redirect to Donor Dashboard
+        router.push('/donor-dashboard'); 
       } catch (error: any) {
         console.error('Error logging in Donor:', error);
         let description = 'Invalid email or password. Please try again.';
@@ -83,7 +83,7 @@ export default function LoginDonorPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in">
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in py-8">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-4 mx-auto w-fit">
@@ -131,7 +131,7 @@ export default function LoginDonorPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90" disabled={isPending}>
+              <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />

@@ -69,12 +69,12 @@ export default function RegisterDonorPage() {
         const user = userCredential.user;
 
         if (user) {
-          const donorData: Omit<Donor, 'id'> = { // Omit 'id' as it's not part of the base Donor type for creation
+          const donorData: Omit<Donor, 'id'> = { 
             uid: user.uid,
             name: data.name,
             email: data.email,
             role: 'donor',
-            createdAt: serverTimestamp(), // Firestore server timestamp
+            createdAt: serverTimestamp(),
           };
           
           await setDoc(doc(firebaseDb, 'donors', user.uid), donorData);
@@ -84,7 +84,7 @@ export default function RegisterDonorPage() {
             description: 'Your donor account has been created. Please login.',
           });
           form.reset();
-          router.push('/login-donor'); // Redirect to donor login page
+          router.push('/login-donor'); 
         } else {
           console.error('Registration: Firebase user object is null after successful creation call.');
           toast({
@@ -204,7 +204,7 @@ export default function RegisterDonorPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90" disabled={isPending}>
+              <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />

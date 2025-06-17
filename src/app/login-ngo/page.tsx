@@ -15,11 +15,11 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, LogIn, Mail, KeyRound } from 'lucide-react';
+import { Loader2, LogIn, Mail, KeyRound, Building2 } from 'lucide-react'; // Changed Building to Building2
 import React, { useTransition } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config'; // Import auth and firebaseInitError
+import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config'; 
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 
@@ -62,13 +62,11 @@ export default function LoginNgoPage() {
           description: 'Welcome back to MediShare.',
         });
         form.reset();
-        router.push('/');
+        router.push('/ngo-dashboard'); // Redirect to NGO Dashboard
       } catch (error: any) {
         console.error('Error logging in NGO:', error);
         let description = 'Invalid email or password. Please try again.';
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-          description = 'Incorrect email or password.';
-        } else if (error.code === 'auth/invalid-credential') {
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
             description = 'Incorrect email or password.';
         } else {
           description = error.message || 'An unexpected error occurred.';
@@ -83,11 +81,11 @@ export default function LoginNgoPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in">
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in py-8">
       <Card className="w-full max-w-md shadow-xl">
         <CardHeader className="text-center">
           <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4 mx-auto w-fit">
-            <LogIn className="h-10 w-10 text-primary" />
+            <Building2 className="h-10 w-10 text-primary" />
           </div>
           <CardTitle className="text-3xl font-headline text-primary">NGO Login</CardTitle>
           <CardDescription>
@@ -131,7 +129,7 @@ export default function LoginNgoPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90" disabled={isPending}>
+              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />

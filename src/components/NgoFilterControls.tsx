@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -11,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, ListFilter, X } from 'lucide-react';
+import { Search, ListFilter, XCircle } from 'lucide-react'; // Changed X to XCircle
 import type { NGO } from '@/types';
 import { ngoTypes as allNgoTypes } from '@/data/mockData';
 
@@ -42,7 +43,7 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
         <div>
           <Label htmlFor="location-search" className="text-lg font-semibold mb-2 block text-primary">
-            <Search className="inline-block h-5 w-5 mr-2 text-accent" />
+            <Search className="inline-block h-5 w-5 mr-2 text-primary" />
             Search by Location
           </Label>
           <div className="relative">
@@ -59,7 +60,7 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
         </div>
         <div>
           <Label htmlFor="ngo-type-filter" className="text-lg font-semibold mb-2 block text-primary">
-            <ListFilter className="inline-block h-5 w-5 mr-2 text-accent" />
+            <ListFilter className="inline-block h-5 w-5 mr-2 text-primary" />
             Filter by Type
           </Label>
           <Select value={filters.type} onValueChange={handleTypeChange}>
@@ -79,7 +80,7 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
       </div>
       {hasActiveFilters && (
          <Button variant="ghost" onClick={onResetFilters} className="text-sm text-accent hover:text-accent/80">
-            <X className="mr-2 h-4 w-4" />
+            <XCircle className="mr-2 h-4 w-4" />
             Reset Filters
           </Button>
       )}

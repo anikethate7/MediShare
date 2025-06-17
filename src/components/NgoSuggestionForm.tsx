@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,8 +19,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { suggestNgos } from '@/ai/flows/suggest-ngos';
 import type { SuggestNgosOutput } from '@/ai/flows/suggest-ngos';
 import React, { useState, useTransition } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Lightbulb, MapPin } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Loader2, Lightbulb, MapPin, Pill } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -54,7 +55,7 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
   });
 
   function onSubmit(data: NgoSuggestionFormValues) {
-    onSuggestionsReady(null); // Clear previous suggestions
+    onSuggestionsReady(null); 
     startTransition(async () => {
       try {
         const result = await suggestNgos(data);
@@ -75,9 +76,12 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
     <Card className="w-full max-w-2xl mx-auto shadow-xl animate-slide-in-up">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-2xl font-headline text-primary">
-          <Lightbulb className="h-6 w-6 text-accent" />
-          Find NGOs for Your Medicine Donation
+          <Lightbulb className="h-6 w-6 text-primary" />
+          AI-Powered NGO Suggestions
         </CardTitle>
+        <CardDescription>
+          Describe your donation and location, and our AI will suggest relevant NGOs.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -87,7 +91,9 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
               name="medicineDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">Medicine Description</FormLabel>
+                  <FormLabel className="text-lg flex items-center gap-2">
+                     <Pill className="h-5 w-5 text-muted-foreground" /> Medicine Description
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="e.g., Unopened pack of Crocin 500mg, expires 12/2025. Pain relievers, fever reducers."
@@ -97,7 +103,7 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
                     />
                   </FormControl>
                   <FormDescription id="medicine-description-help">
-                    Describe the medicine(s) you wish to donate. Include name, strength (if known), quantity, and expiry date.
+                    Include name, strength (if known), quantity, and expiry date.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -108,7 +114,9 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
               name="donorLocation"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-lg">Your Location</FormLabel>
+                  <FormLabel className="text-lg flex items-center gap-2">
+                    <MapPin className="h-5 w-5 text-muted-foreground" /> Your Location
+                  </FormLabel>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     <FormControl>
@@ -122,14 +130,16 @@ export function NgoSuggestionForm({ onSuggestionsReady }: NgoSuggestionFormProps
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90" disabled={isPending}>
+            <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                   Getting Suggestions...
                 </>
               ) : (
-                'Suggest NGOs'
+                <>
+                  <Lightbulb className="mr-2 h-5 w-5" /> Suggest NGOs
+                </>
               )}
             </Button>
           </form>
