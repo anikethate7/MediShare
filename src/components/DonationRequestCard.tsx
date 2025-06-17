@@ -57,7 +57,7 @@ export function DonationRequestCard({ request, ngo: initialNgo, fetchNgoDetails 
   const getUrgencyBadgeVariant = (urgency: DonationRequest['urgency']) => {
     switch (urgency) {
       case 'High': return 'destructive';
-      case 'Medium': return 'default'; // Uses primary color
+      case 'Medium': return 'default'; 
       case 'Low': return 'secondary';
       default: return 'outline';
     }
@@ -114,6 +114,7 @@ export function DonationRequestCard({ request, ngo: initialNgo, fetchNgoDetails 
       {currentNgoDetails && (
         <SendOfferDialog
           ngo={currentNgoDetails}
+          requestedMedicineName={request.medicineName}
           isOpen={isSendOfferDialogOpen}
           onOpenChange={setIsSendOfferDialogOpen}
         />
