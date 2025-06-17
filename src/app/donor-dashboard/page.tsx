@@ -88,26 +88,25 @@ export default function DonorDashboardPage() {
 
         } catch (err: any) {
           console.error('Error fetching open donation requests:', err);
-          let description = 'Could not load donation requests. Please try again later.';
+          let toastTitle = 'Error Fetching Requests';
+          let toastDescription = 'Could not load donation requests. Please try again later.';
+          let toastDuration = 10000;
+
           if (err.code === 'failed-precondition') {
-            description = "The query requires an index. Check Firestore indexing. The console might have a link to create it.";
-            toast({
-              variant: 'destructive',
-              title: 'Database Index Required',
-              description: description,
-              duration: 15000,
-            });
+            toastTitle = 'Database Index Required';
+            toastDescription = "The query requires an index. Check Firestore indexing. The console might have a link to create it.";
+            toastDuration = 15000;
           } else if (err.code === 'permission-denied') {
-            description = "You don't have permission to view these requests. Check Firestore security rules.";
+            toastDescription = "You don't have permission to view these requests. Check Firestore security rules.";
           } else {
-            description = err.message || description;
+            toastDescription = err.message || toastDescription;
           }
-          setError(description);
+          setError(toastDescription); // Set the error state for UI display
           toast({
               variant: 'destructive',
-              title: 'Error Fetching Requests',
-              description: description,
-              duration: 10000,
+              title: toastTitle,
+              description: toastDescription,
+              duration: toastDuration,
           });
         } finally {
           setIsLoadingRequests(false);
