@@ -71,27 +71,31 @@ export default function DonorPage() {
         await Promise.all(ngoPromises);
 
       } catch (err: any) {
-        console.error('Error fetching open donation requests:', err);
-        let description = 'Could not load donation requests. Please try again later.';
+        console.error('Error fetching open donation requests:', err); // This console.error IS the place you should look for the link.
+        let uiErrorText = 'Could not load donation requests. Please try again later.';
+        let toastTitle = 'Error Fetching Requests';
+        let toastDescription = uiErrorText;
+        let toastDuration = 10000;
+
         if (err.code === 'failed-precondition') {
-          description = "The query requires an index. Please check Firestore indexing or contact support. The console might contain a direct link to create it.";
-           toast({
-            variant: 'destructive',
-            title: 'Database Index Required',
-            description: `A database index is needed to view requests. If you are an admin, please check the browser console for a link to create it in Firebase. Error: ${err.message}`,
-            duration: 15000,
-          });
+          toastTitle = 'Database Index Required';
+          toastDescription = "A Firestore index is missing. Please check your browser's developer console for a link to create it.";
+          uiErrorText = "Action Required: A Firestore database index is missing.\n\nPlease open your browser's developer console (usually by pressing F12 or right-clicking -> Inspect -> Console).\n\nLook for an error message from Firebase that includes a direct link to create the required index in the Firebase Console. Click that link to resolve this issue.";
+          toastDuration = 20000; // Longer duration for this important message
         } else if (err.code === 'permission-denied') {
-          description = "You don't have permission to view these requests. Please check Firestore security rules.";
+          toastTitle = 'Permission Denied';
+          uiErrorText = "You don't have permission to view these requests. Please check your Firestore security rules.";
+          toastDescription = uiErrorText;
         } else {
-           description = err.message || description;
+          uiErrorText = err.message || uiErrorText;
+          toastDescription = uiErrorText;
         }
-        setError(description);
+        setError(uiErrorText);
         toast({
             variant: 'destructive',
-            title: 'Error Fetching Requests',
-            description: description,
-            duration: 10000,
+            title: toastTitle,
+            description: toastDescription,
+            duration: toastDuration,
         });
       } finally {
         setIsLoading(false);
@@ -126,8 +130,7 @@ export default function DonorPage() {
         <div className="flex flex-col items-center justify-center py-12 text-center bg-destructive/10 p-6 rounded-lg">
           <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-destructive mb-2">Could Not Load Requests</h3>
-          <p className="text-destructive/80 max-w-md mx-auto">{error}</p>
-          <p className="text-xs text-destructive/70 mt-3">If this problem persists, please contact support or check the browser console for more details.</p>
+          <p className="text-destructive/80 max-w-md mx-auto whitespace-pre-line">{error}</p>
         </div>
       )}
 
