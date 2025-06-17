@@ -8,33 +8,33 @@ body {
 
 @layer base {
   :root {
-    --background: 220 30% 97%; /* Very Light Cool Gray */
-    --foreground: 220 10% 25%; /* Dark Soft Charcoal */
+    --background: 220 40% 98%; /* Very light, cool almost-white */
+    --foreground: 220 20% 15%; /* Dark, cool charcoal */
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 220 10% 25%;
+    --card: 0 0% 100%; /* Pure White */
+    --card-foreground: 220 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 10% 25%;
+    --popover-foreground: 220 20% 15%;
 
-    --primary: 210 70% 55%; /* Welcoming Blue */
-    --primary-foreground: 0 0% 100%; /* White text for primary */
+    --primary: 205 90% 50%; /* Bright, strong blue */
+    --primary-foreground: 0 0% 100%; 
 
-    --secondary: 210 30% 92%; /* Lighter secondary */
-    --secondary-foreground: 210 70% 35%; /* Darker blue text on secondary */
+    --secondary: 210 40% 94%; /* Light cool gray for secondary elements */
+    --secondary-foreground: 205 70% 30%; /* Darker blue text on secondary */
 
-    --muted: 210 30% 88%; /* Muted color */
-    --muted-foreground: 215 20% 55%; /* Muted foreground text */
+    --muted: 210 40% 90%; /* Muted cool gray */
+    --muted-foreground: 215 25% 50%; /* Muted foreground text */
 
-    --accent: 160 60% 45%; /* Vibrant Teal/Green */
-    --accent-foreground: 0 0% 100%; /* White text for accent */
+    --accent: 170 80% 45%; /* Vibrant cyan/teal */
+    --accent-foreground: 220 20% 10%; /* Dark text for good contrast on accent */
 
-    --destructive: 0 72% 51%; /* Standard destructive red */
+    --destructive: 0 75% 55%; /* Standard destructive red */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 20% 88%; /* Softer border color */
-    --input: 210 20% 94%; /* Input background - slightly different from card */
-    --ring: 210 70% 55%; /* Primary color for focus rings */
+    --border: 210 30% 88%; /* Softer, cool border */
+    --input: 210 30% 95%; /* Input background */
+    --ring: 205 90% 50%; /* Primary color for focus rings */
 
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -43,45 +43,45 @@ body {
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
 
-    /* Sidebar specific colors - adjusted to new theme */
+    /* Sidebar specific colors - futuristic light */
     --sidebar-background: 220 30% 95%; 
-    --sidebar-foreground: 220 10% 25%;
-    --sidebar-primary: 210 70% 55%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 60% 45%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 210 20% 85%;
-    --sidebar-ring: 210 70% 55%;
+    --sidebar-foreground: 220 20% 20%;
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: 210 25% 85%;
+    --sidebar-ring: hsl(var(--ring));
   }
 
   .dark {
-    --background: 220 15% 12%; /* Dark background */
-    --foreground: 210 30% 95%; /* Light text */
+    --background: 220 20% 8%; /* Very dark, near black cool blue */
+    --foreground: 210 40% 96%; /* Light cool gray */
 
-    --card: 220 15% 18%; /* Dark card */
-    --card-foreground: 210 30% 95%;
+    --card: 220 20% 12%; /* Dark card, slightly lighter than bg */
+    --card-foreground: 210 40% 96%;
 
-    --popover: 220 15% 18%;
-    --popover-foreground: 210 30% 95%;
+    --popover: 220 20% 12%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 210 70% 60%; /* Primary - can be slightly brighter in dark */
-    --primary-foreground: 220 10% 15%; /* Dark text on primary for dark mode */
+    --primary: 205 80% 55%; /* Vibrant blue, good in dark mode */
+    --primary-foreground: 220 15% 95%; /* Very light text on dark primary */
 
-    --secondary: 220 15% 25%; /* Dark secondary */
-    --secondary-foreground: 210 30% 95%;
+    --secondary: 220 15% 20%; /* Dark secondary */
+    --secondary-foreground: 210 40% 90%;
 
-    --muted: 220 15% 25%;
-    --muted-foreground: 215 20% 70%;
+    --muted: 220 15% 20%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 160 60% 50%; /* Accent - slightly brighter for dark mode */
-    --accent-foreground: 0 0% 100%;
+    --accent: 170 70% 50%; /* Bright cyan/teal for accent */
+    --accent-foreground: 220 20% 10%; /* Dark text for good contrast on accent */
 
-    --destructive: 0 63% 51%;
+    --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 210 15% 30%; /* Dark border */
-    --input: 210 15% 30%;
-    --ring: 210 70% 60%;
+    --border: 210 15% 25%; /* Dark border */
+    --input: 210 15% 25%;
+    --ring: 205 80% 55%;
 
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
@@ -89,14 +89,15 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --sidebar-background: 220 15% 15%;
-    --sidebar-foreground: 210 30% 95%;
-    --sidebar-primary: 210 70% 60%;
-    --sidebar-primary-foreground: 220 10% 15%;
-    --sidebar-accent: 160 60% 50%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 210 15% 25%;
-    --sidebar-ring: 210 70% 60%;
+    /* Sidebar specific colors - futuristic dark */
+    --sidebar-background: 220 20% 10%;
+    --sidebar-foreground: 210 30% 92%;
+    --sidebar-primary: hsl(var(--primary));
+    --sidebar-primary-foreground: hsl(var(--primary-foreground));
+    --sidebar-accent: hsl(var(--accent));
+    --sidebar-accent-foreground: hsl(var(--accent-foreground));
+    --sidebar-border: 210 15% 20%;
+    --sidebar-ring: hsl(var(--ring));
   }
 }
 
@@ -114,14 +115,14 @@ body {
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-muted/50; /* Use a slightly transparent muted for track */
+    @apply bg-muted/30; /* Use a slightly transparent muted for track */
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/60; /* Primary with some transparency */
+    @apply bg-primary/50; /* Primary with some transparency */
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/80; /* Darken on hover */
+    @apply bg-primary/70; /* Darken on hover */
   }
 }
