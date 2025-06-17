@@ -5,7 +5,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, doc, getDoc } from 'firebase/firestore';
 import type { DonationRequest, NGO } from '@/types';
-import { Loader2, ListChecks, Frown, AlertTriangle, HandHeart } from 'lucide-react';
+import { Loader2, HandHeart, Frown, AlertTriangle } from 'lucide-react';
 import { DonationRequestCard } from '@/components/DonationRequestCard';
 import { useToast } from '@/hooks/use-toast';
 
@@ -14,6 +14,7 @@ export default function DonorPage() {
   const [ngosData, setNgosData] = useState<Record<string, NGO>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isIndexError, setIsIndexError] = useState(false);
   const { toast } = useToast();
 
   const fetchNgoDetails = useCallback(async (ngoUid: string): Promise<NGO | null> => {
@@ -46,6 +47,7 @@ export default function DonorPage() {
       }
       setIsLoading(true);
       setError(null);
+      setIsIndexError(false);
       try {
         const requestsQuery = query(
           collection(firebaseDb, 'donationRequests'),
@@ -71,17 +73,18 @@ export default function DonorPage() {
         await Promise.all(ngoPromises);
 
       } catch (err: any) {
-        console.error('Error fetching open donation requests:', err); // This console.error IS the place you should look for the link.
+        console.error('Error fetching open donation requests:', err); 
         let uiErrorText = 'Could not load donation requests. Please try again later.';
         let toastTitle = 'Error Fetching Requests';
         let toastDescription = uiErrorText;
         let toastDuration = 10000;
 
         if (err.code === 'failed-precondition') {
+          setIsIndexError(true);
           toastTitle = 'Database Index Required';
-          toastDescription = "A Firestore index is missing. Please check your browser's developer console for a link to create it.";
-          uiErrorText = "Action Required: A Firestore database index is missing.\n\nPlease open your browser's developer console (usually by pressing F12 or right-clicking -> Inspect -> Console).\n\nLook for an error message from Firebase that includes a direct link to create the required index in the Firebase Console. Click that link to resolve this issue.";
-          toastDuration = 20000; // Longer duration for this important message
+          toastDescription = "A Firestore index is missing for querying donation requests. Please check your browser's developer console (usually F12 -> Console tab) for a direct link from Firebase to create it. Click that link to resolve this issue.";
+          uiErrorText = "Action Required: A Firestore database index is missing.\n\nTo view donation requests, a specific index needs to be created in your Firebase Firestore database.\n\n1. Open your browser's developer console (usually by pressing F12 or right-clicking -> Inspect -> Console).\n2. Look for an error message starting with 'FirebaseError: The query requires an index...'.\n3. This error message will contain a direct link. Click this link to go to the Firebase Console and create the missing index.\n\nAfter the index is built (which may take a few minutes), refresh this page.";
+          toastDuration = 20000; 
         } else if (err.code === 'permission-denied') {
           toastTitle = 'Permission Denied';
           uiErrorText = "You don't have permission to view these requests. Please check your Firestore security rules.";
@@ -129,8 +132,15 @@ export default function DonorPage() {
       {!isLoading && error && (
         <div className="flex flex-col items-center justify-center py-12 text-center bg-destructive/10 p-6 rounded-lg">
           <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-destructive mb-2">Could Not Load Requests</h3>
+           <h3 className="text-xl font-semibold text-destructive mb-2">
+            {isIndexError ? "Database Index Required" : "Could Not Load Requests"}
+          </h3>
           <p className="text-destructive/80 max-w-md mx-auto whitespace-pre-line">{error}</p>
+           {isIndexError && (
+            <p className="text-xs text-destructive/70 mt-3">
+              Please follow the instructions above or in the toast notification. The developer console (F12) will contain the direct link from Firebase.
+            </p>
+          )}
         </div>
       )}
 
@@ -159,5 +169,3 @@ export default function DonorPage() {
     </div>
   );
 }
-
-// Removed metadata export
