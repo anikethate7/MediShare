@@ -120,9 +120,6 @@ const createMockTimestamp = (date: Date): Timestamp => ({
   toString: function (): string {
      return `Timestamp(seconds=${this.seconds}, nanoseconds=${this.nanoseconds})`;
   },
-  // These are not typically on client-side mock unless needed for specific logic not present here
-  // compareTo: function (other: Timestamp): number { return 0; }, 
-  // _compareTo: function (other: Timestamp): number { return 0; }, 
 });
 
 
@@ -133,7 +130,7 @@ export const mockImpactStories: ImpactStory[] = [
     ngoName: 'Asha Health Clinic',
     title: 'Critical Medicines Arrived Just In Time!',
     storyContent: "Thanks to a generous donation of antibiotics through MediShare, we were able to treat a sudden outbreak of infections in the community. Many children's lives were positively impacted. This platform truly makes a difference!",
-    imageUrl: 'https://placehold.co/600x300.png',
+    imageUrl: 'https://placehold.co/600x350.png', // Slightly different size for variety
     'data-ai-hint': 'doctor child',
     createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 2)), // 2 days ago
   },
@@ -144,7 +141,7 @@ export const mockImpactStories: ImpactStory[] = [
     title: 'Elderly Care Program Enhanced',
     storyContent: "The regular supply of vitamins and common pain relievers we received has greatly helped our elderly care program. Our seniors are feeling better and more active. We are grateful for the continuous support from donors.",
     imageUrl: 'https://placehold.co/600x400.png',
-    'data-ai-hint': 'elderly happy',
+    'data-ai-hint': 'elderly people happy', // More specific hint
     createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 5)), // 5 days ago
   },
   {
@@ -153,8 +150,18 @@ export const mockImpactStories: ImpactStory[] = [
     ngoName: 'Sahayata Disaster Relief',
     title: 'First-Aid Kits Made a Huge Difference',
     storyContent: "During the recent flash floods, the first-aid supplies donated via MediShare were invaluable. Our team could provide immediate assistance to many injured individuals. Thank you for helping us respond effectively!",
-    // No image for this one
-    'data-ai-hint': 'emergency aid',
+    imageUrl: undefined, // This story will use the default placeholder
+    'data-ai-hint': 'emergency aid', // This hint will be used for the default placeholder
     createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 10)), // 10 days ago
+  },
+  {
+    id: 'story4',
+    ngoUid: 'mock-uid-manav-kalyan',
+    ngoName: 'Manav Kalyan Sanstha',
+    title: 'Supporting Health Camps',
+    storyContent: "With the medicines collected through MediShare, we successfully organized a health camp in a remote village, providing essential care to over 200 people. The platform has been instrumental in our outreach efforts.",
+    imageUrl: 'https://placehold.co/500x300.png',
+    'data-ai-hint': 'medical camp',
+    createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 15)), // 15 days ago
   },
 ];
