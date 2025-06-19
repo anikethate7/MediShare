@@ -17,9 +17,16 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   allowedDevOrigins: ['https://*.cloudworkstations.dev'],
 };
 
 export default nextConfig;
+

@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useTransition } from 'react';
+import React, { useTransition, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Progress } from '@/components/ui/progress';
 import {
   DialogContent,
   DialogHeader,
@@ -25,16 +26,16 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Loader2, BookOpen, FileText, Image as ImageIcon, Feather } from 'lucide-react';
+import { Loader2, BookOpen, FileText, Image as ImageIcon, Feather, UploadCloud } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { db as firebaseDb } from '@/lib/firebase/config';
+import { db as firebaseDb, storage as firebaseStorage } from '@/lib/firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 const createStoryFormSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters.').max(150),
   storyContent: z.string().min(50, 'Story content must be at least 50 characters.').max(5000),
-  imageUrl: z.string().url('Please enter a valid URL for the image.').optional().or(z.literal('')),
-  imageAiHint: z.string().max(50, 'AI hint too long').optional().or(z.literal('')),
+  imageAiHint: z.string().max(50, 'AI hint too long (max 2 words recommended)').optional().or(z.literal('')),
 });
 
 type CreateStoryFormValues = z.infer<typeof createStoryFormSchema>;
@@ -54,51 +55,124 @@ export function CreateImpactStoryForm({
 }: CreateImpactStoryFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const form = useForm<CreateStoryFormValues>({
     resolver: zodResolver(createStoryFormSchema),
     defaultValues: {
       title: '',
       storyContent: '',
-      imageUrl: '',
       imageAiHint: 'community help',
     },
   });
 
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        toast({
+          variant: "destructive",
+          title: "File Too Large",
+          description: "Image size should not exceed 5MB.",
+        });
+        setImageFile(null);
+        setImagePreview(null);
+        event.target.value = ''; 
+        return;
+      }
+      if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid File Type",
+          description: "Please upload an image (PNG, JPG, GIF, WEBP).",
+        });
+        setImageFile(null);
+        setImagePreview(null);
+        event.target.value = '';
+        return;
+      }
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImageFile(null);
+      setImagePreview(null);
+    }
+  };
+
   async function onSubmit(data: CreateStoryFormValues) {
-    if (!firebaseDb) {
+    if (!firebaseDb || !firebaseStorage) {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Database not configured. Cannot create story.',
+        description: 'Database or Storage not configured. Cannot create story.',
       });
       return;
     }
 
     startTransition(async () => {
+      let uploadedImageUrl = '';
+
+      if (imageFile) {
+        setUploadProgress(0);
+        const storagePath = `impact_stories/${ngoUid}/${Date.now()}_${imageFile.name}`;
+        const storageRef = ref(firebaseStorage, storagePath);
+        const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+        try {
+          await new Promise<void>((resolve, reject) => {
+            uploadTask.on('state_changed',
+              (snapshot) => {
+                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                setUploadProgress(progress);
+              },
+              (error) => {
+                console.error("Upload failed:", error);
+                reject(error);
+              },
+              async () => {
+                uploadedImageUrl = await getDownloadURL(uploadTask.snapshot.ref);
+                resolve();
+              }
+            );
+          });
+        } catch (error: any) {
+          toast({ variant: 'destructive', title: 'Image Upload Failed', description: error.message || 'Could not upload the image.' });
+          setUploadProgress(null);
+          return; 
+        }
+        setUploadProgress(null);
+      }
+
       try {
         await addDoc(collection(firebaseDb, 'impactStories'), {
           ngoUid,
           ngoName,
           title: data.title,
           storyContent: data.storyContent,
-          imageUrl: data.imageUrl || '',
-          'data-ai-hint': data.imageAiHint || 'community help',
+          imageUrl: uploadedImageUrl, // Store the Firebase Storage URL
+          'data-ai-hint': data.imageAiHint || (uploadedImageUrl ? 'charity impact' : ''),
           createdAt: serverTimestamp(),
-          // isApproved: true, // Default to true, or implement moderation flow
         });
         toast({
           title: 'Story Submitted!',
           description: 'Your impact story has been shared.',
         });
         form.reset();
+        setImageFile(null);
+        setImagePreview(null);
         onSuccess();
       } catch (error: any) {
-        console.error('Error creating impact story:', error);
+        console.error('Error creating impact story document:', error);
         toast({
           variant: 'destructive',
           title: 'Submission Failed',
-          description: error.message || 'An unexpected error occurred. Please try again.',
+          description: error.message || 'An unexpected error occurred while saving the story. Please try again.',
         });
       }
     });
@@ -116,7 +190,7 @@ export function CreateImpactStoryForm({
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-4 max-h-[70vh] overflow-y-auto pr-2">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
           <FormField
             control={form.control}
             name="title"
@@ -153,29 +227,48 @@ export function CreateImpactStoryForm({
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="imageUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Image URL (Optional)</FormLabel>
-                <FormControl>
-                  <div className="relative">
-                    <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input type="url" placeholder="https://example.com/image.png (Use placehold.co for testing)" {...field} className="pl-10" />
-                  </div>
-                </FormControl>
-                <FormDescription>Link to an image that illustrates your story. Ensure you have rights to use it.</FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          
+          <FormItem>
+            <FormLabel className="flex items-center gap-2">
+                <UploadCloud className="h-5 w-5 text-muted-foreground" />
+                Story Image (Optional)
+            </FormLabel>
+            <FormControl>
+              <Input
+                type="file"
+                accept="image/png, image/jpeg, image/gif, image/webp"
+                onChange={handleFileChange}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+              />
+            </FormControl>
+            <FormDescription>Upload an image (max 5MB). PNG, JPG, GIF, WEBP accepted.</FormDescription>
+             {/* No FormMessage here as file validation is manual for now */}
+          </FormItem>
+
+          {imagePreview && (
+            <div className="mt-2">
+              <FormLabel>Image Preview</FormLabel>
+              <img src={imagePreview} alt="Selected image preview" className="mt-1 max-h-40 w-auto rounded-md border" />
+            </div>
+          )}
+
+          {uploadProgress !== null && (
+            <div className="space-y-1 mt-2">
+              <FormLabel>Upload Progress</FormLabel>
+              <Progress value={uploadProgress} className="w-full [&>div]:bg-accent" />
+              <p className="text-xs text-muted-foreground">{uploadProgress.toFixed(0)}% uploaded</p>
+            </div>
+          )}
+
            <FormField
             control={form.control}
             name="imageAiHint"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Image AI Hint (Optional)</FormLabel>
+                <FormLabel className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                  Image AI Hint (Optional)
+                </FormLabel>
                 <FormControl>
                   <div className="relative">
                     <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -183,7 +276,7 @@ export function CreateImpactStoryForm({
                   </div>
                 </FormControl>
                 <FormDescription>
-                    Keywords for placeholder images (max 2 words, e.g., "happy children", "medical help").
+                    Keywords for placeholder or AI image description (max 2 words, e.g., "happy children", "medical help").
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -191,15 +284,15 @@ export function CreateImpactStoryForm({
           />
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>
+              <Button type="button" variant="outline" onClick={() => { form.reset(); setImageFile(null); setImagePreview(null); onCancel();}} disabled={isPending}>
                 Cancel
               </Button>
             </DialogClose>
-            <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
+            <Button type="submit" className="bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending || uploadProgress !== null}>
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Submitting Story...
+                  {uploadProgress !== null ? 'Uploading Image...' : 'Submitting Story...'}
                 </>
               ) : (
                 'Submit Story'
@@ -211,3 +304,4 @@ export function CreateImpactStoryForm({
     </DialogContent>
   );
 }
+
