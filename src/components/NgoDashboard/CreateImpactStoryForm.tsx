@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useTransition, useState } from 'react';
+import React, { useTransition, useState, useRef } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
@@ -58,6 +58,7 @@ export function CreateImpactStoryForm({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<CreateStoryFormValues>({
     resolver: zodResolver(createStoryFormSchema),
@@ -79,7 +80,7 @@ export function CreateImpactStoryForm({
         });
         setImageFile(null);
         setImagePreview(null);
-        event.target.value = ''; 
+        if (fileInputRef.current) fileInputRef.current.value = ''; 
         return;
       }
       if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
@@ -90,7 +91,7 @@ export function CreateImpactStoryForm({
         });
         setImageFile(null);
         setImagePreview(null);
-        event.target.value = '';
+        if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
       setImageFile(file);
@@ -100,8 +101,10 @@ export function CreateImpactStoryForm({
       };
       reader.readAsDataURL(file);
     } else {
+      // No file selected or selection cancelled
       setImageFile(null);
       setImagePreview(null);
+      // Note: fileInputRef.current.value is already empty if selection was cancelled by user in OS dialog
     }
   };
 
@@ -155,7 +158,7 @@ export function CreateImpactStoryForm({
           ngoName,
           title: data.title,
           storyContent: data.storyContent,
-          imageUrl: uploadedImageUrl, // Store the Firebase Storage URL
+          imageUrl: uploadedImageUrl, 
           'data-ai-hint': data.imageAiHint || (uploadedImageUrl ? 'charity impact' : ''),
           createdAt: serverTimestamp(),
         });
@@ -166,6 +169,9 @@ export function CreateImpactStoryForm({
         form.reset();
         setImageFile(null);
         setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         onSuccess();
       } catch (error: any) {
         console.error('Error creating impact story document:', error);
@@ -176,6 +182,17 @@ export function CreateImpactStoryForm({
         });
       }
     });
+  }
+  
+  const handleCancel = () => {
+    form.reset(); 
+    setImageFile(null); 
+    setImagePreview(null);
+    setUploadProgress(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    onCancel();
   }
 
   return (
@@ -235,6 +252,7 @@ export function CreateImpactStoryForm({
             </FormLabel>
             <FormControl>
               <Input
+                ref={fileInputRef}
                 type="file"
                 accept="image/png, image/jpeg, image/gif, image/webp"
                 onChange={handleFileChange}
@@ -242,7 +260,6 @@ export function CreateImpactStoryForm({
               />
             </FormControl>
             <FormDescription>Upload an image (max 5MB). PNG, JPG, GIF, WEBP accepted.</FormDescription>
-             {/* No FormMessage here as file validation is manual for now */}
           </FormItem>
 
           {imagePreview && (
@@ -284,7 +301,7 @@ export function CreateImpactStoryForm({
           />
           <DialogFooter className="pt-4">
             <DialogClose asChild>
-              <Button type="button" variant="outline" onClick={() => { form.reset(); setImageFile(null); setImagePreview(null); onCancel();}} disabled={isPending}>
+              <Button type="button" variant="outline" onClick={handleCancel} disabled={isPending}>
                 Cancel
               </Button>
             </DialogClose>
@@ -304,4 +321,3 @@ export function CreateImpactStoryForm({
     </DialogContent>
   );
 }
-
