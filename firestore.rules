@@ -7,7 +7,8 @@ service cloud.firestore {
     // Rules for the 'ngos' collection
     match /ngos/{userId} {
       allow read: if true; // Public read access
-      allow write: if request.auth != null && request.auth.uid == userId; // Owner write
+      // Allow authenticated user to write to their own NGO document
+      allow create, update, delete: if request.auth != null && request.auth.uid == userId;
     }
 
     // Rules for the 'donationRequests' collection
@@ -26,8 +27,8 @@ service cloud.firestore {
 
     // Rules for the 'donors' collection
     match /donors/{userId} {
-      // Allow owner to read and write their donor profile
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Allow authenticated user to read and write to their own donor document
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == userId;
     }
 
     // Rules for 'impactStories' collection
@@ -53,3 +54,4 @@ service cloud.firestore {
     }
   }
 }
+    
