@@ -1,0 +1,55 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Rules for the 'ngos' collection
+    match /ngos/{userId} {
+      allow read: if true; // Public read access
+      allow write: if request.auth != null && request.auth.uid == userId; // Owner write
+    }
+
+    // Rules for the 'donationRequests' collection
+    match /donationRequests/{requestId} {
+      // Allow authenticated NGOs to create requests
+      // - User must be logged in.
+      // - A document with the user's UID must exist in the 'ngos' collection.
+      // - The 'ngoUid' in the new request must match the creator's UID.
+      allow create: if request.auth != null &&
+                      exists(/databases/$(database)/documents/ngos/$(request.auth.uid)) &&
+                      request.resource.data.ngoUid == request.auth.uid;
+      allow read: if true; // Public read access
+      // Allow owner NGO to update or delete their requests
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ngoUid;
+    }
+
+    // Rules for the 'donors' collection
+    match /donors/{userId} {
+      // Allow owner to read and write their donor profile
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Rules for 'impactStories' collection
+    match /impactStories/{storyId} {
+      // Allow anyone to read impact stories
+      allow read: if true;
+
+      // Allow authenticated NGOs to create stories
+      // - User must be logged in.
+      // - A document with the user's UID must exist in the 'ngos' collection.
+      // - The 'ngoUid' in the new story must match the creator's UID.
+      // - The 'ngoName' in the new story should match the NGO's profile name.
+      allow create: if request.auth != null &&
+                      exists(/databases/$(database)/documents/ngos/$(request.auth.uid)) &&
+                      request.resource.data.ngoUid == request.auth.uid &&
+                      request.resource.data.ngoName == get(/databases/$(database)/documents/ngos/$(request.auth.uid)).data.name;
+
+      // Allow authenticated NGOs to update or delete ONLY THEIR OWN stories
+      // - User must be logged in.
+      // - The 'ngoUid' in the existing story document must match the user's UID.
+      allow update, delete: if request.auth != null &&
+                              resource.data.ngoUid == request.auth.uid;
+    }
+  }
+}
