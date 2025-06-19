@@ -41,7 +41,7 @@ body {
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --radius: 0.75rem; /* Increased radius slightly for a softer look */
 
     /* Sidebar specific colors - futuristic light */
     --sidebar-background: 220 30% 95%; 
@@ -111,18 +111,37 @@ body {
   }
   /* Custom scrollbar for a more modern look */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 8px; /* Default width */
+    height: 8px; /* Default height for horizontal scrollbar */
   }
   ::-webkit-scrollbar-track {
-    @apply bg-muted/30; /* Use a slightly transparent muted for track */
+    @apply bg-muted/20; /* Use a slightly transparent muted for track */
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-primary/50; /* Primary with some transparency */
+    @apply bg-primary/40; /* Primary with some transparency */
     border-radius: 10px;
+    border: 2px solid transparent; /* Creates padding around thumb */
+    background-clip: content-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-primary/70; /* Darken on hover */
+    @apply bg-primary/60; /* Darken on hover */
   }
+
+  /* For thin scrollbar utility */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+   .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-primary/50;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-primary/70;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-primary/10;
+  }
+
+
 }

@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { mockImpactStories } from '@/data/mockData';
 
-const STORIES_TO_SHOW = 3;
+const STORIES_TO_SHOW = 6; // Show more for horizontal scroll
 
 export function HomepageImpactStoriesSection() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
@@ -48,7 +48,6 @@ export function HomepageImpactStoriesSection() {
         if (fetchedStories.length > 0) {
           setStories(fetchedStories);
         } else {
-          // No stories from DB, but DB is connected. Section will not render based on current logic.
           setStories([]); 
         }
       } catch (err: any) {
@@ -72,7 +71,7 @@ export function HomepageImpactStoriesSection() {
 
   if (isLoading) {
     return (
-      <section className="w-full max-w-5xl mx-auto py-8 md:py-12">
+      <section className="w-full mx-auto py-8 md:py-12">
         <div className="text-center mb-6 md:mb-8">
           <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
             Recent Impact Stories
@@ -86,13 +85,35 @@ export function HomepageImpactStoriesSection() {
     );
   }
 
+  if (stories.length === 0 && !error) { 
+    // Only show "No stories yet" if there was no error and DB returned empty (or mock is empty)
+    return (
+      <section className="w-full mx-auto py-8 md:py-12">
+        <div className="text-center mb-6 md:mb-8">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
+            Making a Difference
+          </h2>
+        </div>
+        <div className="flex flex-col items-center justify-center py-10 text-center">
+          <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
+          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Impact Stories Shared Yet</h3>
+          <p className="text-muted-foreground mt-1 md:mt-2 max-w-md mx-auto text-sm md:text-base">
+            NGOs haven't shared any impact stories yet. Check back soon!
+          </p>
+        </div>
+      </section>
+    );
+  }
+  
   // Render section if there are stories (either fetched or mock due to error/no DB)
-  if (stories.length === 0) { 
+  // AND if there are stories to show
+  if (stories.length === 0) {
     return null;
   }
 
+
   return (
-    <section className="w-full max-w-5xl mx-auto py-10 md:py-16 animate-fade-in">
+    <section className="w-full mx-auto py-10 md:py-16 animate-fade-in">
       <div className="text-center mb-6 md:mb-10">
         <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
           <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
@@ -105,16 +126,23 @@ export function HomepageImpactStoriesSection() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8">
+      {error && ( 
+        <div className="text-center text-sm text-muted-foreground mb-6 bg-muted/50 p-3 rounded-md max-w-2xl mx-auto">
+            <AlertTriangle className="inline-block h-4 w-4 mr-1.5 text-destructive" />
+            {error}
+        </div>
+      )}
+      
+      <div className="flex overflow-x-auto space-x-4 md:space-x-6 py-4 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-primary/10 scrollbar-thumb-rounded-full">
         {stories.map(story => (
-          <ImpactStoryCard key={story.id} story={story} />
+          <div key={story.id} className="flex-shrink-0 w-80 md:w-96">
+            <ImpactStoryCard story={story} />
+          </div>
         ))}
+         {/* Add a small spacer at the end for better visual cutoff if not enough items to fill */}
+        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>}
       </div>
       
-      {error && ( // Display the error message if mock stories are shown due to an issue
-        <p className="text-center text-sm text-muted-foreground mt-6 bg-muted/50 p-3 rounded-md">{error}</p>
-      )}
-
       <div className="mt-8 md:mt-12 text-center">
         <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent/10 hover:text-accent text-sm sm:text-base">
           <Link href="/impact-stories">
