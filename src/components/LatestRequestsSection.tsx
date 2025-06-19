@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { db as firebaseDb } from '@/lib/firebase/config';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import type { DonationRequest } from '@/types';
-import { Loader2, ListChecks, Frown, AlertTriangle, ArrowRight, Pill, Building, Thermometer } from 'lucide-react';
+import { Loader2, ListChecks, AlertTriangle, ArrowRight, Pill, Building, Thermometer } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,7 +37,7 @@ export function LatestRequestsSection() {
         const requestsQuery = query(
           collection(firebaseDb, 'donationRequests'),
           where('status', '==', 'Open'),
-          where('urgency', '==', 'High'), // Only fetch High urgency requests
+          where('urgency', '==', 'High'), 
           orderBy('createdAt', 'desc'),
           limit(REQUESTS_TO_SHOW)
         );
@@ -75,6 +75,10 @@ export function LatestRequestsSection() {
     }
   };
 
+  // If not loading, no error, and no requests, hide the entire section.
+  if (!isLoading && !error && requests.length === 0) {
+    return null;
+  }
 
   return (
     <section className="w-full max-w-5xl mx-auto py-10 md:py-16">
@@ -105,15 +109,7 @@ export function LatestRequestsSection() {
         </div>
       )}
       
-      {!isLoading && !error && requests.length === 0 && (
-        <div className="text-center py-10">
-          <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No "High" Urgency Requests</h3>
-          <p className="text-muted-foreground mt-1 text-sm md:text-base max-w-md mx-auto">
-            There are currently no "High" urgency donation requests listed.
-          </p>
-        </div>
-      )}
+      {/* The case for requests.length === 0 is handled by the early return null above */}
 
       {!isLoading && !error && requests.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
@@ -157,13 +153,17 @@ export function LatestRequestsSection() {
         </div>
       )}
       
-      <div className="mt-10 md:mt-12 text-center">
-        <Button asChild variant="default" size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-base sm:text-lg">
-          <Link href="/donor">
-            View All Donation Requests <ArrowRight className="ml-2 h-5 w-5" />
-          </Link>
-        </Button>
-      </div>
+      {/* "View All" button - only shows if not loading (meaning error or requests are present) */}
+      {(!isLoading) && (
+        <div className="mt-10 md:mt-12 text-center">
+            <Button asChild variant="default" size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-base sm:text-lg">
+            <Link href="/donor">
+                View All Donation Requests <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+            </Button>
+        </div>
+      )}
     </section>
   );
 }
+
