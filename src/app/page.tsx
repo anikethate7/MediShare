@@ -5,47 +5,29 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, UserCircle, Building2, HeartPulse } from 'lucide-react';
 import { LatestRequestsSection } from '@/components/LatestRequestsSection';
 import { HomepageImpactStoriesSection } from '@/components/HomepageImpactStoriesSection';
-import { db as firebaseDb } from '@/lib/firebase/config';
-import { collection, query, where, getDocs, limit as firestoreLimit } from 'firebase/firestore'; // Renamed limit to avoid conflict
-
-async function getUrgentRequestsFlag() {
-  if (!firebaseDb) return false;
-  try {
-    const requestsQuery = query(
-      collection(firebaseDb, 'donationRequests'),
-      where('status', '==', 'Open'),
-      where('urgency', '==', 'High'),
-      firestoreLimit(1)
-    );
-    const querySnapshot = await getDocs(requestsQuery);
-    return !querySnapshot.empty;
-  } catch (error) {
-    console.error("Error checking for urgent requests on homepage:", error);
-    return false; 
-  }
-}
+// The db import and getUrgentRequestsFlag are no longer needed here as the hero section will always show.
+// Firestore checks for urgent requests are handled within LatestRequestsSection.
 
 export default async function HomePage() {
-  const hasUrgentRequests = await getUrgentRequestsFlag();
+  // const hasUrgentRequests = await getUrgentRequestsFlag(); // This line is removed
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-250px)] py-8 md:py-12 animate-fade-in space-y-12 md:space-y-16">
       
-      {hasUrgentRequests && (
-        <section className="text-center max-w-3xl mx-auto">
-          <div className="mb-4 md:mb-6">
-            <HeartPulse className="h-16 w-16 md:h-20 md:w-20 text-primary mx-auto opacity-80" />
-          </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold mb-4 md:mb-6">
-            <span className="text-primary">Medi</span><span className="text-accent">Share</span>: Bridging Gaps,
-            <br className="hidden sm:block" />
-            Saving Lives.
-          </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-foreground/70 leading-relaxed">
-            Connect, Donate, Impact. We empower communities by redistributing surplus medicines to those who need them most, seamlessly and effectively.
-          </p>
-        </section>
-      )}
+      {/* Main hero section - now always visible */}
+      <section className="text-center max-w-3xl mx-auto">
+        <div className="mb-4 md:mb-6">
+          <HeartPulse className="h-16 w-16 md:h-20 md:w-20 text-primary mx-auto opacity-80" />
+        </div>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-headline font-bold mb-4 md:mb-6">
+          <span className="text-primary">Medi</span><span className="text-accent">Share</span>: Bridging Gaps,
+          <br className="hidden sm:block" />
+          Saving Lives.
+        </h1>
+        <p className="text-lg sm:text-xl md:text-2xl text-foreground/70 leading-relaxed">
+          Connect, Donate, Impact. We empower communities by redistributing surplus medicines to those who need them most, seamlessly and effectively.
+        </p>
+      </section>
 
       <section className="w-full max-w-3xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
