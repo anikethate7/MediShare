@@ -17,18 +17,18 @@ const STORIES_TO_SHOW = 3;
 export function HomepageImpactStoriesSection() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null); // Renamed from error for clarity
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchStories = async () => {
       setIsLoading(true);
-      setError(null);
+      setStatusMessage(null);
 
       if (!firebaseDb) {
         console.warn("HomepageImpactStories: Firebase DB not configured. Displaying mock stories.");
         setStories(mockImpactStories.slice(0, STORIES_TO_SHOW));
-        setError("Displaying sample stories as database is not connected.");
+        setStatusMessage("Displaying sample stories as database is not connected.");
         setIsLoading(false);
         return;
       }
@@ -40,38 +40,37 @@ export function HomepageImpactStoriesSection() {
           limit(STORIES_TO_SHOW)
         );
         const querySnapshot = await getDocs(storiesQuery);
-        const fetchedStories = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as ImpactStory[];
         
-        if (fetchedStories.length > 0) {
-          setStories(fetchedStories);
+        if (querySnapshot.empty) {
+          setStories(mockImpactStories.slice(0, STORIES_TO_SHOW));
+          setStatusMessage("No live impact stories found. Displaying sample stories for demonstration.");
         } else {
-          setStories([]); 
+          const fetchedStories = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as ImpactStory[];
+          setStories(fetchedStories);
         }
       } catch (err: any) {
         console.error('Error fetching impact stories for homepage:', err);
         let uiErrorText = 'Could not load recent impact stories. Showing sample stories instead.';
         let toastTitle = 'Trouble Fetching Stories';
-        let toastDuration = 7000;
-
+        
         if (err.code === 'permission-denied') {
           uiErrorText = "Could not load stories due to missing permissions. Please check your Firestore security rules. Showing sample stories instead.";
           toastTitle = 'Permission Error';
-          toastDuration = 10000;
         } else if (err.code === 'failed-precondition') {
            uiErrorText = "A Firestore index might be missing for 'impactStories'. Showing sample stories instead.";
            toastTitle = 'Database Index Required';
         }
         
-        setError(uiErrorText);
+        setStatusMessage(uiErrorText); // Use statusMessage to display issues
         setStories(mockImpactStories.slice(0, STORIES_TO_SHOW)); 
         toast({
             variant: err.code === 'permission-denied' ? 'destructive' : 'default',
             title: toastTitle,
             description: uiErrorText,
-            duration: toastDuration,
+            duration: 10000,
         });
       } finally {
         setIsLoading(false);
@@ -99,8 +98,9 @@ export function HomepageImpactStoriesSection() {
       </section>
     );
   }
-
-  if (stories.length === 0 && !error) { 
+  
+  // No stories to show at all (neither fetched nor mock, which shouldn't happen with current logic unless mockImpactStories is empty)
+  if (stories.length === 0 && !statusMessage) { 
     return (
       <section className="w-full mx-auto py-8 md:py-12">
         <div className="text-center mb-6 md:mb-8">
@@ -113,9 +113,9 @@ export function HomepageImpactStoriesSection() {
         </div>
         <div className="flex flex-col items-center justify-center py-10 text-center">
           <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
-          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Impact Stories Shared Yet</h3>
+          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Impact Stories Available</h3>
           <p className="text-muted-foreground mt-1 md:mt-2 max-w-md mx-auto text-sm md:text-base">
-            NGOs haven't shared any impact stories yet. Check back soon!
+            Check back soon to see how donations are helping!
           </p>
         </div>
          <div className="mt-8 md:mt-12 text-center">
@@ -129,6 +129,7 @@ export function HomepageImpactStoriesSection() {
     );
   }
   
+  // If mock data is empty and no status message, effectively hide.
   if (stories.length === 0) {
     return null; 
   }
@@ -147,10 +148,10 @@ export function HomepageImpactStoriesSection() {
         </p>
       </div>
 
-      {error && ( 
+      {statusMessage && ( 
         <div className="text-center text-sm text-muted-foreground mb-6 bg-destructive/10 p-3 rounded-md max-w-2xl mx-auto">
             <AlertTriangle className="inline-block h-4 w-4 mr-1.5 text-destructive" />
-            {error}
+            {statusMessage}
         </div>
       )}
       

@@ -13,18 +13,18 @@ import { mockImpactStories } from '@/data/mockData';
 export default function ImpactStoriesPage() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null); // Renamed from error
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchStories = async () => {
       setIsLoading(true);
-      setError(null);
+      setStatusMessage(null);
 
       if (!firebaseDb) {
         console.warn("ImpactStoriesPage: Firebase DB not configured. Displaying mock stories.");
         setStories(mockImpactStories); 
-        setError("Displaying sample stories as database is not connected.");
+        setStatusMessage("Displaying sample stories as database is not connected.");
         setIsLoading(false);
         return;
       }
@@ -35,38 +35,37 @@ export default function ImpactStoriesPage() {
           orderBy('createdAt', 'desc')
         );
         const querySnapshot = await getDocs(storiesQuery);
-        const fetchedStories = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as ImpactStory[];
         
-        if (fetchedStories.length > 0) {
-            setStories(fetchedStories);
+        if (querySnapshot.empty) {
+          setStories(mockImpactStories);
+          setStatusMessage("No live impact stories found. Displaying sample stories for demonstration.");
         } else {
-            setStories([]);
+          const fetchedStories = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          })) as ImpactStory[];
+          setStories(fetchedStories);
         }
       } catch (err: any) {
         console.error('Error fetching impact stories:', err);
         let uiErrorText = 'Could not load impact stories. Showing sample stories instead.';
         let toastTitle = 'Error Fetching Stories';
-        let toastDuration = 7000;
-
+        
         if (err.code === 'permission-denied') {
           uiErrorText = "Could not load stories due to missing permissions. Please check your Firestore security rules. Showing sample stories instead.";
           toastTitle = 'Permission Error';
-          toastDuration = 10000;
         } else if (err.code === 'failed-precondition') {
            uiErrorText = "A Firestore index might be missing for 'impactStories'. Showing sample stories instead.";
            toastTitle = 'Database Index Required';
         }
         
-        setError(uiErrorText);
+        setStatusMessage(uiErrorText);
         setStories(mockImpactStories); 
         toast({
             variant: err.code === 'permission-denied' ? 'destructive' : 'default',
             title: toastTitle,
             description: uiErrorText,
-            duration: toastDuration,
+            duration: 10000,
         });
       } finally {
         setIsLoading(false);
@@ -97,14 +96,14 @@ export default function ImpactStoriesPage() {
         </div>
       )}
 
-      {!isLoading && error && stories.length > 0 && (
+      {statusMessage && stories.length > 0 && ( // Only show status message if there are stories (likely mock ones)
          <div className="mb-6 text-center bg-destructive/10 p-3 rounded-md">
           <AlertTriangle className="h-5 w-5 text-destructive inline-block mr-2" />
-          <p className="text-sm text-destructive/90 inline">{error}</p>
+          <p className="text-sm text-destructive/90 inline">{statusMessage}</p>
         </div>
       )}
       
-      {!isLoading && !error && stories.length === 0 && (
+      {!isLoading && stories.length === 0 && !statusMessage && ( // True "no stories" state
         <div className="flex flex-col items-center justify-center py-10 md:py-12 text-center">
           <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
           <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Impact Stories Yet</h3>
