@@ -37,7 +37,7 @@ export function LatestRequestsSection() {
         const requestsQuery = query(
           collection(firebaseDb, 'donationRequests'),
           where('status', '==', 'Open'),
-          orderBy('urgency', 'asc'), 
+          where('urgency', '==', 'High'), // Only fetch High urgency requests
           orderBy('createdAt', 'desc'),
           limit(REQUESTS_TO_SHOW)
         );
@@ -49,10 +49,10 @@ export function LatestRequestsSection() {
         
         setRequests(fetchedRequests);
       } catch (err: any) {
-        console.error('Error fetching latest requests:', err);
-        let uiErrorText = 'Could not load latest donation requests.';
+        console.error('Error fetching latest high urgency requests:', err);
+        let uiErrorText = 'Could not load high urgency donation requests.';
          if (err.code === 'failed-precondition') {
-           uiErrorText = "A Firestore index is missing. Please check the developer console (F12) for a link to create it. This is needed to show latest requests.";
+           uiErrorText = "A Firestore index is missing. Please check the developer console (F12) for a link to create it. This is needed to show high urgency requests.";
            toast({ variant: 'destructive', title: 'Database Index Required', description: uiErrorText, duration: 15000 });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: uiErrorText });
@@ -67,6 +67,8 @@ export function LatestRequestsSection() {
   }, [toast]);
   
   const getUrgencyBadgeVariant = (urgency: DonationRequest['urgency']) => {
+    // Since we only fetch 'High', this will always be 'destructive'
+    // but keeping it for consistency if logic changes later.
     switch (urgency) {
       case 'High': return 'destructive';
       case 'Medium': return 'default';
@@ -83,17 +85,17 @@ export function LatestRequestsSection() {
           <ListChecks className="h-8 w-8 md:h-10 md:w-10 text-accent" />
         </div>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold text-accent mb-1 md:mb-2">
-          Urgently Needed Medicines
+          Extremely Needed Medicines
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-foreground/70 max-w-xl mx-auto">
-          A quick look at some of the current high-priority needs from NGOs.
+          A quick look at the current "High" priority needs from NGOs.
         </p>
       </div>
 
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-10 space-y-3">
           <Loader2 className="h-8 w-8 md:h-10 md:w-10 animate-spin text-accent" />
-          <p className="text-sm text-muted-foreground">Loading latest requests...</p>
+          <p className="text-sm text-muted-foreground">Loading extremely needed requests...</p>
         </div>
       )}
 
@@ -108,9 +110,9 @@ export function LatestRequestsSection() {
       {!isLoading && !error && requests.length === 0 && (
         <div className="text-center py-10">
           <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3" />
-          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Urgent Requests Currently</h3>
+          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No "High" Urgency Requests</h3>
           <p className="text-muted-foreground mt-1 text-sm md:text-base max-w-md mx-auto">
-            All urgent needs seem to be covered for now, or no new requests have been posted.
+            There are currently no "High" urgency donation requests listed.
           </p>
         </div>
       )}
@@ -167,3 +169,4 @@ export function LatestRequestsSection() {
     </section>
   );
 }
+
