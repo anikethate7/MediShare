@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, UserCircle, Building2, HeartPulse } from 'lucide-react';
 import { HowItWorksSection } from '@/components/HowItWorksSection';
 import { LatestRequestsSection } from '@/components/LatestRequestsSection';
+import { HomepageImpactStoriesSection } from '@/components/HomepageImpactStoriesSection';
 
 export default function HomePage() {
   return (
@@ -70,6 +71,7 @@ export default function HomePage() {
 
       <HowItWorksSection />
       <LatestRequestsSection />
+      <HomepageImpactStoriesSection />
 
     </div>
   );

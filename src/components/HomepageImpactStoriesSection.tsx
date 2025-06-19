@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { mockImpactStories } from '@/data/mockData';
 
-const STORIES_TO_SHOW = 6; // Show more for horizontal scroll
+const STORIES_TO_SHOW = 6; 
 
 export function HomepageImpactStoriesSection() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
@@ -73,8 +73,11 @@ export function HomepageImpactStoriesSection() {
     return (
       <section className="w-full mx-auto py-8 md:py-12">
         <div className="text-center mb-6 md:mb-8">
+          <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
+            <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
+          </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
-            Recent Impact Stories
+            Making a Difference
           </h2>
         </div>
         <div className="flex flex-col items-center justify-center py-10 space-y-3">
@@ -85,14 +88,13 @@ export function HomepageImpactStoriesSection() {
     );
   }
 
-  // This component might not be used on the homepage anymore, 
-  // but keeping its logic if it's directly used elsewhere or for reference.
-  // If it's definitely no longer used, it can be removed.
-
   if (stories.length === 0 && !error) { 
     return (
       <section className="w-full mx-auto py-8 md:py-12">
         <div className="text-center mb-6 md:mb-8">
+           <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
+            <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
+          </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
             Making a Difference
           </h2>

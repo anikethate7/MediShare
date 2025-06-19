@@ -37,7 +37,7 @@ export function LatestRequestsSection() {
         const requestsQuery = query(
           collection(firebaseDb, 'donationRequests'),
           where('status', '==', 'Open'),
-          orderBy('urgency', 'asc'), // High, Medium, Low
+          orderBy('urgency', 'asc'), 
           orderBy('createdAt', 'desc'),
           limit(REQUESTS_TO_SHOW)
         );
@@ -158,7 +158,7 @@ export function LatestRequestsSection() {
       )}
       
       <div className="mt-10 md:mt-12 text-center">
-        <Button asChild variant="default" size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground text-base sm:text-lg">
+        <Button asChild variant="default" size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground text-base sm:text-lg">
           <Link href="/donor">
             View All Donation Requests <ArrowRight className="ml-2 h-5 w-5" />
           </Link>

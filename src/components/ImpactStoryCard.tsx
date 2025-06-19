@@ -18,7 +18,7 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
     : 'N/A';
 
   return (
-    <Card className="flex flex-col h-full overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group bg-card border border-border/50 hover:border-primary/30">
+    <Card className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 group bg-card">
       {story.imageUrl && (
         <div className="relative w-full h-48 sm:h-52 overflow-hidden">
           <Image
@@ -36,20 +36,20 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
       )}
       <CardHeader className="px-4 md:px-5 pt-4 pb-2">
         <CardTitle className="text-lg md:text-xl font-headline font-semibold text-primary group-hover:text-primary/90 transition-colors flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary flex-shrink-0" /> {/* Icon color matches title */}
+          <BookOpen className="h-5 w-5 text-primary flex-shrink-0" />
           {story.title}
         </CardTitle>
-        <CardDescription className="text-xs text-muted-foreground pt-1.5 flex items-center"> {/* Increased pt slightly */}
+        <CardDescription className="text-xs text-muted-foreground pt-1.5 flex items-center">
           <Building className="h-3.5 w-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
           {story.ngoName}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow px-4 md:px-5 pt-1 pb-4"> {/* Adjusted pt and pb */}
+      <CardContent className="flex-grow px-4 md:px-5 pt-1 pb-4">
         <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed">
           {story.storyContent}
         </p>
       </CardContent>
-      <CardFooter className="mt-auto border-t border-border/50 px-4 md:px-5 py-3 flex justify-end items-center"> {/* Consistent py */}
+      <CardFooter className="mt-auto border-t border-border/50 px-4 md:px-5 py-3 flex justify-end items-center">
         <div className="text-xs text-muted-foreground flex items-center gap-1">
           <CalendarDays className="h-3.5 w-3.5 flex-shrink-0" /> {timeAgo}
         </div>
@@ -57,4 +57,3 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
     </Card>
   );
 }
-
