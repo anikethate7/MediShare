@@ -80,7 +80,7 @@ export function CreateImpactStoryForm({
         });
         setImageFile(null);
         setImagePreview(null);
-        if (fileInputRef.current) fileInputRef.current.value = ''; 
+        if (fileInputRef.current) fileInputRef.current.value = '';
         return;
       }
       if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
@@ -101,10 +101,8 @@ export function CreateImpactStoryForm({
       };
       reader.readAsDataURL(file);
     } else {
-      // No file selected or selection cancelled
       setImageFile(null);
       setImagePreview(null);
-      // Note: fileInputRef.current.value is already empty if selection was cancelled by user in OS dialog
     }
   };
 
@@ -112,7 +110,7 @@ export function CreateImpactStoryForm({
     if (!firebaseDb || !firebaseStorage) {
       toast({
         variant: 'destructive',
-        title: 'Error',
+        title: 'Configuration Error',
         description: 'Database or Storage not configured. Cannot create story.',
       });
       return;
@@ -135,7 +133,7 @@ export function CreateImpactStoryForm({
                 setUploadProgress(progress);
               },
               (error) => {
-                console.error("Upload failed:", error);
+                console.error("Upload failed during task:", error);
                 reject(error);
               },
               async () => {
@@ -145,9 +143,29 @@ export function CreateImpactStoryForm({
             );
           });
         } catch (error: any) {
-          toast({ variant: 'destructive', title: 'Image Upload Failed', description: error.message || 'Could not upload the image.' });
+          let title = 'Image Upload Failed';
+          let description = 'Could not upload the image. Please check your network connection, CORS settings for Firebase Storage, and try again.';
+          if (error.code) {
+            description = `Error: ${error.code}. ${error.message || description}`;
+            if (error.code === 'storage/unauthorized') {
+              title = 'Upload Authorization Failed';
+              description = "You are not authorized to upload to this location. Please check your Firebase Storage security rules.";
+            } else if (error.code === 'storage/canceled') {
+              title = 'Upload Cancelled';
+              description = "The image upload was cancelled.";
+            } else if (error.code === 'storage/unknown' && error.message && error.message.includes('Cors')) {
+              title = 'CORS Issue Suspected';
+              description = "The upload failed, possibly due to a CORS misconfiguration on your Firebase Storage bucket. Please verify your bucket's CORS settings.";
+            } else if (error.code.startsWith('storage/')) {
+                title = 'Storage Error';
+            }
+          } else if (error.message) {
+            description = error.message;
+          }
+          console.error('Firebase Storage Upload Error Object:', error);
+          toast({ variant: 'destructive', title: title, description: description, duration: 15000 });
           setUploadProgress(null);
-          return; 
+          return;
         }
         setUploadProgress(null);
       }
@@ -158,7 +176,7 @@ export function CreateImpactStoryForm({
           ngoName,
           title: data.title,
           storyContent: data.storyContent,
-          imageUrl: uploadedImageUrl, 
+          imageUrl: uploadedImageUrl,
           'data-ai-hint': data.imageAiHint || (uploadedImageUrl ? 'charity impact' : ''),
           createdAt: serverTimestamp(),
         });
@@ -177,16 +195,16 @@ export function CreateImpactStoryForm({
         console.error('Error creating impact story document:', error);
         toast({
           variant: 'destructive',
-          title: 'Submission Failed',
+          title: 'Story Submission Failed',
           description: error.message || 'An unexpected error occurred while saving the story. Please try again.',
         });
       }
     });
   }
-  
+
   const handleCancel = () => {
-    form.reset(); 
-    setImageFile(null); 
+    form.reset();
+    setImageFile(null);
     setImagePreview(null);
     setUploadProgress(null);
     if (fileInputRef.current) {
@@ -244,7 +262,7 @@ export function CreateImpactStoryForm({
               </FormItem>
             )}
           />
-          
+
           <FormItem>
             <FormLabel className="flex items-center gap-2">
                 <UploadCloud className="h-5 w-5 text-muted-foreground" />
