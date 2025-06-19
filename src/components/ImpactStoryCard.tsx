@@ -17,17 +17,34 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
     ? formatDistanceToNowStrict(story.createdAt.toDate(), { addSuffix: true })
     : 'N/A';
 
-  // Determine the image source and AI hint
-  const actualImageUrl = story.imageUrl; // Store the original value
-  const displayImageUrl = actualImageUrl || `https://placehold.co/600x400.png`;
-  
-  let imageAiHintValue = "community event"; // Default for generic placeholder
-  if (actualImageUrl && story['data-ai-hint']) { // Image provided, and hint provided for that image
-    imageAiHintValue = story['data-ai-hint'];
-  } else if (actualImageUrl && !story['data-ai-hint']) { // Image provided, but no specific hint for it
-    imageAiHintValue = "charity success";
-  } else if (!actualImageUrl && story['data-ai-hint']) { // No image provided, but story has a general hint
-    imageAiHintValue = story['data-ai-hint'];
+  let determinedDisplayImageUrl = `https://placehold.co/600x400.png`; // Default placeholder
+  let imageIsFromStory = false;
+
+  if (story.imageUrl) {
+    try {
+      const parsedUrl = new URL(story.imageUrl);
+      // Only allow images from 'placehold.co' as per next.config.ts
+      if (parsedUrl.hostname === 'placehold.co') {
+        determinedDisplayImageUrl = story.imageUrl;
+        imageIsFromStory = true;
+      } else {
+        // Silently fall back to placeholder for unconfigured hosts
+        // console.warn(`Image from unconfigured host (${parsedUrl.hostname}) for story "${story.title}". Using placeholder.`);
+      }
+    } catch (e) {
+      // Silently fall back to placeholder for invalid URLs
+      // console.warn(`Invalid image URL format for story "${story.title}": ${story.imageUrl}. Using placeholder.`);
+    }
+  }
+
+  let imageAiHintValue: string;
+  if (imageIsFromStory) {
+    // Using the image provided in the story data (and it's valid)
+    imageAiHintValue = story['data-ai-hint'] || "charity success";
+  } else {
+    // Using a placeholder (either because no story.imageUrl or it was invalid/unallowed host)
+    // If the story had a hint, use that for the placeholder, otherwise use a generic placeholder hint.
+    imageAiHintValue = story['data-ai-hint'] || "community event";
   }
 
 
@@ -36,7 +53,7 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
       {/* Image container - always rendered */}
       <div className="relative w-full h-40 sm:h-48 overflow-hidden rounded-t-xl">
         <Image
-          src={displayImageUrl}
+          src={determinedDisplayImageUrl}
           alt={story.title || "Impact story image"}
           layout="fill"
           objectFit="cover"
@@ -69,3 +86,4 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
     </Card>
   );
 }
+
