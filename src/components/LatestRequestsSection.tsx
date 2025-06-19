@@ -28,7 +28,7 @@ export function LatestRequestsSection() {
       setError(null);
 
       if (!firebaseDb) {
-        setError("Database not configured. Cannot display latest requests.");
+        setError("Database not configured. Cannot display urgent requests.");
         setIsLoading(false);
         return;
       }
@@ -49,10 +49,10 @@ export function LatestRequestsSection() {
         
         setRequests(fetchedRequests);
       } catch (err: any) {
-        console.error('Error fetching latest high urgency requests:', err);
-        let uiErrorText = 'Could not load high urgency donation requests.';
+        console.error('Error fetching high urgency requests:', err);
+        let uiErrorText = 'Could not load urgent donation requests.';
          if (err.code === 'failed-precondition') {
-           uiErrorText = "A Firestore index is missing. Please check the developer console (F12) for a link to create it. This is needed to show high urgency requests.";
+           uiErrorText = "A Firestore index is missing. Please check the developer console (F12) for a link to create it. This is needed to show urgent requests.";
            toast({ variant: 'destructive', title: 'Database Index Required', description: uiErrorText, duration: 15000 });
         } else {
             toast({ variant: 'destructive', title: 'Error', description: uiErrorText });
@@ -67,8 +67,6 @@ export function LatestRequestsSection() {
   }, [toast]);
   
   const getUrgencyBadgeVariant = (urgency: DonationRequest['urgency']) => {
-    // Since we only fetch 'High', this will always be 'destructive'
-    // but keeping it for consistency if logic changes later.
     switch (urgency) {
       case 'High': return 'destructive';
       case 'Medium': return 'default';
@@ -85,7 +83,7 @@ export function LatestRequestsSection() {
           <ListChecks className="h-8 w-8 md:h-10 md:w-10 text-accent" />
         </div>
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold text-accent mb-1 md:mb-2">
-          Extremely Needed Medicines
+          Urgent Medicine Requirements
         </h2>
         <p className="text-sm sm:text-base md:text-lg text-foreground/70 max-w-xl mx-auto">
           A quick look at the current "High" priority needs from NGOs.
@@ -95,7 +93,7 @@ export function LatestRequestsSection() {
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-10 space-y-3">
           <Loader2 className="h-8 w-8 md:h-10 md:w-10 animate-spin text-accent" />
-          <p className="text-sm text-muted-foreground">Loading extremely needed requests...</p>
+          <p className="text-sm text-muted-foreground">Loading urgent requests...</p>
         </div>
       )}
 
@@ -169,4 +167,3 @@ export function LatestRequestsSection() {
     </section>
   );
 }
-
