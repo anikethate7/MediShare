@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { HeartPulse, Search, LogOut, LayoutDashboard, HandHeart, UserCircle, Building2, Menu, X, BookOpenText } from 'lucide-react';
+import { HeartPulse, Search, LogOut, LayoutDashboard, HandHeart, UserCircle, Building2, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -120,12 +120,6 @@ export function AppHeader() {
               Browse NGOs
             </Link>
           </Button>
-           <Button variant={getButtonVariant("/impact-stories")} size={buttonSize} asChild className={cn("justify-start", isMobile ? "w-full" : "sm:justify-center")}>
-            <Link href="/impact-stories" onClick={commonLinkAction} className={getLinkClassName("/impact-stories", activeAccent, `flex items-center gap-1.5 ${linkSizeClass}`)}>
-              <BookOpenText className="h-4 w-4" />
-              Impact Stories
-            </Link>
-          </Button>
            <Button variant="outline" size={buttonSize} onClick={handleLogout} className={cn("border-destructive text-destructive hover:bg-destructive/10 hover:text-destructive-foreground justify-start", linkSizeClass, isMobile ? "w-full" : "sm:justify-center")}>
             <LogOut className="h-4 w-4 mr-1" />
             <span>Logout</span>
@@ -152,12 +146,6 @@ export function AppHeader() {
             <Search className="h-4 w-4" />
             Browse NGOs
           </Link>
-        </Button>
-        <Button variant={getButtonVariant("/impact-stories")} size={buttonSize} asChild className={cn("justify-start", isMobile ? "w-full" : "sm:justify-center")}>
-            <Link href="/impact-stories" onClick={commonLinkAction} className={getLinkClassName("/impact-stories", activeAccent, `flex items-center gap-1.5 ${linkSizeClass}`)}>
-              <BookOpenText className="h-4 w-4" />
-              Impact Stories
-            </Link>
         </Button>
         <Button variant="outline" size={buttonSize} asChild className={cn("border-accent text-accent hover:bg-accent/10 hover:text-accent justify-start", isMobile ? "w-full" : "sm:justify-center", pathname === "/login-donor" && "bg-accent/10 font-semibold")}>
           <Link href="/login-donor" onClick={commonLinkAction} className={cn("flex items-center gap-1.5", linkSizeClass)}>

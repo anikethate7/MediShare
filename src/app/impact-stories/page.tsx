@@ -68,11 +68,11 @@ export default function ImpactStoriesPage() {
         <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-4 md:mb-6 mx-auto w-fit">
           <BookOpenText className="h-10 w-10 md:h-12 md:w-12 text-accent" />
         </div>
-        <h1 className="text-2xl md:text-4xl font-headline font-bold mb-2 text-accent">
-          Inspiring Impact Stories
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold mb-2 text-accent">
+          All Impact Stories
         </h1>
-        <p className="text-sm md:text-lg text-foreground/80 max-w-2xl mx-auto">
-          Read how donations through MediShare are making a real difference in communities, as shared by NGOs.
+        <p className="text-sm sm:text-base md:text-lg text-foreground/80 max-w-2xl mx-auto">
+          Discover how donations through MediShare are making a real difference in communities, as shared by NGOs.
         </p>
       </section>
 
