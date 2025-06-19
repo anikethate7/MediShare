@@ -118,7 +118,7 @@ export function HomepageImpactStoriesSection() {
   }
   
   if (stories.length === 0) {
-    return null;
+    return null; // Don't render the section if there are no stories and it's not due to an error (already handled by the block above for user-friendly message)
   }
 
   return (
@@ -144,11 +144,11 @@ export function HomepageImpactStoriesSection() {
       
       <div className="flex overflow-x-auto space-x-4 md:space-x-6 py-4 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-primary/10 scrollbar-thumb-rounded-full">
         {stories.map(story => (
-          <div key={story.id} className="flex-shrink-0 w-80 md:w-96">
+          <div key={story.id} className="flex-shrink-0 w-72 sm:w-80 md:w-96"> {/* Adjusted width for consistency */}
             <ImpactStoryCard story={story} />
           </div>
         ))}
-        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>}
+        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>} {/* Sentinel for spacing */}
       </div>
       
       <div className="mt-8 md:mt-12 text-center">
