@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, UserCircle, Building2, HeartPulse } from 'lucide-react';
-import { HomepageImpactStoriesSection } from '@/components/HomepageImpactStoriesSection';
+import { HowItWorksSection } from '@/components/HowItWorksSection';
+import { LatestRequestsSection } from '@/components/LatestRequestsSection';
 
 export default function HomePage() {
   return (
@@ -67,7 +68,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <HomepageImpactStoriesSection />
+      <HowItWorksSection />
+      <LatestRequestsSection />
+
     </div>
   );
 }

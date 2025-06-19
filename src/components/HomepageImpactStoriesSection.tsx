@@ -85,8 +85,11 @@ export function HomepageImpactStoriesSection() {
     );
   }
 
+  // This component might not be used on the homepage anymore, 
+  // but keeping its logic if it's directly used elsewhere or for reference.
+  // If it's definitely no longer used, it can be removed.
+
   if (stories.length === 0 && !error) { 
-    // Only show "No stories yet" if there was no error and DB returned empty (or mock is empty)
     return (
       <section className="w-full mx-auto py-8 md:py-12">
         <div className="text-center mb-6 md:mb-8">
@@ -101,16 +104,20 @@ export function HomepageImpactStoriesSection() {
             NGOs haven't shared any impact stories yet. Check back soon!
           </p>
         </div>
+         <div className="mt-8 md:mt-12 text-center">
+            <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent/10 hover:text-accent text-sm sm:text-base">
+            <Link href="/impact-stories">
+                View All Impact Stories <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+            </Button>
+        </div>
       </section>
     );
   }
   
-  // Render section if there are stories (either fetched or mock due to error/no DB)
-  // AND if there are stories to show
   if (stories.length === 0) {
     return null;
   }
-
 
   return (
     <section className="w-full mx-auto py-10 md:py-16 animate-fade-in">
@@ -139,7 +146,6 @@ export function HomepageImpactStoriesSection() {
             <ImpactStoryCard story={story} />
           </div>
         ))}
-         {/* Add a small spacer at the end for better visual cutoff if not enough items to fill */}
         {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>}
       </div>
       
