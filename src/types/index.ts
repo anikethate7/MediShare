@@ -42,3 +42,15 @@ export interface Donor {
   role: 'donor'; // Explicitly set role
   createdAt: Timestamp; // Firestore Timestamp
 }
+
+export interface ImpactStory {
+  id?: string; // Firestore document ID
+  ngoUid: string;
+  ngoName: string;
+  title: string;
+  storyContent: string;
+  imageUrl?: string;
+  'data-ai-hint'?: string; // For placeholder images
+  createdAt: Timestamp;
+  // isApproved?: boolean; // Future consideration for moderation
+}
