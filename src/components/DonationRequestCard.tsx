@@ -13,8 +13,8 @@ import { useToast } from '@/hooks/use-toast';
 
 interface DonationRequestCardProps {
   request: DonationRequest;
-  ngo: NGO | null; 
-  fetchNgoDetails: (ngoUid: string) => Promise<NGO | null>; 
+  ngo: NGO | null;
+  fetchNgoDetails: (ngoUid: string) => Promise<NGO | null>;
 }
 
 const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetails }: DonationRequestCardProps) => {
@@ -57,7 +57,7 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
   const getUrgencyBadgeVariant = (urgency: DonationRequest['urgency']) => {
     switch (urgency) {
       case 'High': return 'destructive';
-      case 'Medium': return 'default'; 
+      case 'Medium': return 'default';
       case 'Low': return 'secondary';
       default: return 'outline';
     }
@@ -71,7 +71,7 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
         <CardHeader className="pb-2 pt-4">
           <div className="flex justify-between items-start">
             <CardTitle className="text-lg md:text-xl font-headline text-primary flex items-center gap-2">
-              <Pill className="h-5 w-5 text-primary" /> 
+              <Pill className="h-5 w-5 text-primary" />
               {request.medicineName}
             </CardTitle>
             <Badge variant={getUrgencyBadgeVariant(request.urgency)} className="ml-2 shrink-0 text-xs px-2 py-0.5">
@@ -79,7 +79,7 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
             </Badge>
           </div>
           <CardDescription className="text-xs text-muted-foreground pt-1 flex items-center">
-            <Building className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+            <Building className="h-4 w-4 mr-1.5 text-muted-foreground" />
             Requested by: {request.ngoName}
           </CardDescription>
         </CardHeader>
@@ -107,7 +107,7 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
             )}
           </Button>
           <div className="text-xs text-muted-foreground self-end flex items-center gap-1">
-            <CalendarDays className="h-3.5 w-3.5" /> Posted {timeAgo}
+            <CalendarDays className="h-4 w-4" /> Posted {timeAgo}
           </div>
         </CardFooter>
       </Card>

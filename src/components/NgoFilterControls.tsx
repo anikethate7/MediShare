@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Search, ListFilter, XCircle } from 'lucide-react'; // Changed X to XCircle
+import { Search, ListFilter, XCircle } from 'lucide-react';
 import type { NGO } from '@/types';
 import { ngoTypes as allNgoTypes } from '@/data/mockData';
 
@@ -35,14 +35,14 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
   const handleTypeChange = (value: string) => {
     onFilterChange({ ...filters, type: value as NGO['type'] | 'all' });
   };
-  
+
   const hasActiveFilters = filters.location !== '' || filters.type !== 'all';
 
   return (
     <div className="mb-8 p-6 bg-card rounded-lg shadow-md space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
         <div>
-          <Label htmlFor="location-search" className="text-lg font-semibold mb-2 block text-primary">
+          <Label htmlFor="location-search" className="text-base font-semibold mb-2 block text-primary">
             <Search className="inline-block h-5 w-5 mr-2 text-primary" />
             Search by Location
           </Label>
@@ -59,7 +59,7 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
           </div>
         </div>
         <div>
-          <Label htmlFor="ngo-type-filter" className="text-lg font-semibold mb-2 block text-primary">
+          <Label htmlFor="ngo-type-filter" className="text-base font-semibold mb-2 block text-primary">
             <ListFilter className="inline-block h-5 w-5 mr-2 text-primary" />
             Filter by Type
           </Label>
@@ -79,10 +79,12 @@ export function NgoFilterControls({ filters, onFilterChange, onResetFilters }: N
         </div>
       </div>
       {hasActiveFilters && (
-         <Button variant="ghost" onClick={onResetFilters} className="text-sm text-accent hover:text-accent/80">
-            <XCircle className="mr-2 h-4 w-4" />
-            Reset Filters
-          </Button>
+         <div className="pt-2">
+            <Button variant="ghost" onClick={onResetFilters} className="text-sm text-accent hover:text-accent/80">
+                <XCircle className="mr-2 h-4 w-4" />
+                Reset Filters
+            </Button>
+         </div>
       )}
     </div>
   );

@@ -46,19 +46,19 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
                 setIsSendOfferDialogOpen(true);
             } else {
                 toast({ title: "NGO details not found", variant: "destructive" });
-                setCurrentNgoDetails(initialNgoData); 
+                setCurrentNgoDetails(initialNgoData);
                 setIsSendOfferDialogOpen(true);
             }
         } catch (error) {
             console.error("Error fetching NGO details:", error);
             toast({ title: "Error fetching NGO details", variant: "destructive" });
-            setCurrentNgoDetails(initialNgoData); 
-            setIsSendOfferDialogOpen(true); 
+            setCurrentNgoDetails(initialNgoData);
+            setIsSendOfferDialogOpen(true);
         } finally {
             setIsLoadingNgoDetails(false);
         }
     } else {
-        setCurrentNgoDetails(initialNgoData); 
+        setCurrentNgoDetails(initialNgoData);
         setIsSendOfferDialogOpen(true);
     }
   }, [initialNgoData, toast]);
@@ -67,7 +67,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
   return (
     <>
       <Card className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up group">
-        <div className="relative w-full h-36 sm:h-48">
+        <div className="relative w-full h-32 sm:h-40">
           <Image
             src={currentNgoDetails.imageUrl || "https://placehold.co/600x400.png"}
             alt={`${currentNgoDetails.name} activity or premises`}
@@ -75,8 +75,8 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
             objectFit="cover"
             data-ai-hint={currentNgoDetails['data-ai-hint'] || "charity organization"}
             className="group-hover:scale-105 transition-transform duration-300"
-            priority={false} 
-            loading="lazy"   
+            priority={false}
+            loading="lazy"
           />
         </div>
         <CardHeader className="pb-2 pt-4">
@@ -90,7 +90,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
         </CardHeader>
         <CardContent className="flex-grow space-y-2 md:space-y-3 pt-2 pb-3 md:pb-4">
           <div className="flex items-start gap-2 text-xs md:text-sm text-foreground/80">
-            <MapPin className="h-4 w-4 md:h-5 md:w-5 text-accent flex-shrink-0 mt-0.5" />
+            <MapPin className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" />
             <span>{currentNgoDetails.address}, {currentNgoDetails.city}</span>
           </div>
           <p className="text-xs md:text-sm text-foreground/90 line-clamp-3">
@@ -99,7 +99,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
            {currentNgoDetails.services && currentNgoDetails.services.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground mb-1 md:mb-1.5 flex items-center gap-1.5">
-                <Briefcase className="h-3.5 w-3.5 text-accent" />
+                <Briefcase className="h-4 w-4 text-accent" />
                 Key Services:
               </h4>
               <div className="flex flex-wrap gap-1.5">
@@ -121,7 +121,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
           </Button>
         </CardFooter>
       </Card>
-      {currentNgoDetails && ( 
+      {currentNgoDetails && (
          <SendOfferDialog
             ngo={currentNgoDetails}
             isOpen={isSendOfferDialogOpen}

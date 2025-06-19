@@ -19,7 +19,7 @@ import { generateOfferMessage } from '@/ai/flows/generate-offer-message-flow';
 
 interface SendOfferDialogProps {
   ngo: NGO | null;
-  requestedMedicineName?: string; // Added to pass the medicine name
+  requestedMedicineName?: string;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
 }
@@ -86,19 +86,19 @@ export function SendOfferDialog({ ngo, requestedMedicineName, isOpen, onOpenChan
   return (
     <Dialog open={isOpen} onOpenChange={(open) => {
       onOpenChange(open);
-      if (!open) setMessageDraft(''); // Clear draft on close
+      if (!open) setMessageDraft('');
     }}>
       <DialogContent className="sm:max-w-md bg-card rounded-lg shadow-xl">
         <DialogHeader className="mb-2">
-          <DialogTitle className="text-2xl font-headline text-primary flex items-center gap-2">
-            <Building2 className="h-6 w-6 text-primary" /> 
+          <DialogTitle className="text-xl md:text-2xl font-headline text-primary flex items-center gap-2">
+            <Building2 className="h-6 w-6 text-primary" />
             Contact {ngo.name}
           </DialogTitle>
-          <DialogDescription className="text-foreground/80">
+          <DialogDescription className="text-sm text-foreground/80">
             Reach out to {ngo.name} using these details to offer your medicine donation for {requestedMedicineName || 'their needs'}.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-3 py-3 border-b border-border">
           {ngo.contactEmail && (
             <div className="flex items-center justify-between p-2.5 bg-muted/30 rounded-md">
@@ -140,31 +140,34 @@ export function SendOfferDialog({ ngo, requestedMedicineName, isOpen, onOpenChan
         </div>
 
         {requestedMedicineName && (
-          <div className="space-y-3 py-3">
-            <h4 className="text-sm font-medium text-foreground/90 flex items-center gap-1.5">
-              <Edit3 className="h-4 w-4 text-accent" />
-              Need help writing your message?
-            </h4>
+          <div className="space-y-3 py-4 border-t border-border">
+            <h3 className="text-md font-semibold text-foreground flex items-center gap-2">
+              <MessageSquarePlus className="h-5 w-5 text-accent" />
+              AI-Assisted Message Draft
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Let AI help you draft a polite message to {ngo.name} about the {requestedMedicineName}. You can edit the draft below.
+            </p>
             <Button onClick={handleGenerateMessage} disabled={isGenerating} variant="outline" className="w-full text-accent border-accent hover:bg-accent/10">
               {isGenerating ? (
-                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
+                <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating Draft...</>
               ) : (
-                <><MessageSquarePlus className="mr-2 h-4 w-4" /> Generate Polite Message Draft</>
+                <><Edit3 className="mr-2 h-4 w-4" /> Generate Draft</>
               )}
             </Button>
-            {isGenerating && !messageDraft && (
-              <div className="flex items-center justify-center p-4 text-muted-foreground">
+            {(isGenerating && !messageDraft) && (
+              <div className="flex items-center justify-center p-4 text-muted-foreground text-sm">
                 <Loader2 className="h-5 w-5 animate-spin mr-2" /> Thinking...
               </div>
             )}
             {messageDraft && (
-              <div className="space-y-2 mt-2">
+              <div className="space-y-2 mt-3">
                 <Textarea
                   value={messageDraft}
                   onChange={(e) => setMessageDraft(e.target.value)}
                   placeholder="Your message draft will appear here."
                   rows={8}
-                  className="text-sm"
+                  className="text-sm bg-muted/20"
                 />
                 <Button onClick={() => handleCopyToClipboard(messageDraft, 'Message Draft')} variant="secondary" size="sm" className="w-full">
                   <Copy className="mr-2 h-4 w-4" /> Copy Draft
@@ -174,7 +177,7 @@ export function SendOfferDialog({ ngo, requestedMedicineName, isOpen, onOpenChan
           </div>
         )}
 
-        <DialogFooter className="mt-4">
+        <DialogFooter className="mt-2 pt-4 border-t border-border">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
             Close
           </Button>
