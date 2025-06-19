@@ -13,8 +13,8 @@ interface ImpactStoryCardProps {
 }
 
 export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
-  const timeAgo = story.createdAt 
-    ? formatDistanceToNowStrict(story.createdAt.toDate(), { addSuffix: true }) 
+  const timeAgo = story.createdAt
+    ? formatDistanceToNowStrict(story.createdAt.toDate(), { addSuffix: true })
     : 'N/A';
 
   return (
@@ -31,29 +31,30 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
             priority={false}
             loading="lazy"
           />
-           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-70 group-hover:opacity-50 transition-opacity"></div>
+           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10 opacity-70 group-hover:opacity-60 transition-opacity"></div>
         </div>
       )}
-      <CardHeader className="pb-2 pt-4 px-4 md:px-5">
+      <CardHeader className="px-4 md:px-5 pt-4 pb-2">
         <CardTitle className="text-lg md:text-xl font-headline font-semibold text-primary group-hover:text-primary/90 transition-colors flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-primary/80" />
+          <BookOpen className="h-5 w-5 text-primary flex-shrink-0" /> {/* Icon color matches title */}
           {story.title}
         </CardTitle>
-        <CardDescription className="text-xs text-muted-foreground pt-1 flex items-center">
-          <Building className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
+        <CardDescription className="text-xs text-muted-foreground pt-1.5 flex items-center"> {/* Increased pt slightly */}
+          <Building className="h-3.5 w-3.5 mr-1.5 text-muted-foreground flex-shrink-0" />
           {story.ngoName}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow space-y-2 pt-2 pb-3 px-4 md:px-5">
+      <CardContent className="flex-grow px-4 md:px-5 pt-1 pb-4"> {/* Adjusted pt and pb */}
         <p className="text-sm text-foreground/80 line-clamp-3 leading-relaxed">
           {story.storyContent}
         </p>
       </CardContent>
-      <CardFooter className="mt-auto border-t border-border/50 pt-2.5 pb-2.5 px-4 md:px-5 flex justify-end items-center">
+      <CardFooter className="mt-auto border-t border-border/50 px-4 md:px-5 py-3 flex justify-end items-center"> {/* Consistent py */}
         <div className="text-xs text-muted-foreground flex items-center gap-1">
-          <CalendarDays className="h-3.5 w-3.5" /> {timeAgo}
+          <CalendarDays className="h-3.5 w-3.5 flex-shrink-0" /> {timeAgo}
         </div>
       </CardFooter>
     </Card>
   );
 }
+
