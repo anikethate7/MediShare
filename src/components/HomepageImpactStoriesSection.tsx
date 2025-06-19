@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { mockImpactStories } from '@/data/mockData';
 
-const STORIES_TO_SHOW = 6; 
+const STORIES_TO_SHOW = 3; 
 
 export function HomepageImpactStoriesSection() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
@@ -53,13 +53,25 @@ export function HomepageImpactStoriesSection() {
       } catch (err: any) {
         console.error('Error fetching impact stories for homepage:', err);
         let uiErrorText = 'Could not load recent impact stories. Showing sample stories instead.';
+        let toastTitle = 'Trouble Fetching Stories';
+        let toastDuration = 7000;
+
+        if (err.code === 'permission-denied') {
+          uiErrorText = "Could not load stories due to missing permissions. Please check your Firestore security rules. Showing sample stories instead.";
+          toastTitle = 'Permission Error';
+          toastDuration = 10000;
+        } else if (err.code === 'failed-precondition') {
+           uiErrorText = "A Firestore index might be missing for 'impactStories'. Showing sample stories instead.";
+           toastTitle = 'Database Index Required';
+        }
+        
         setError(uiErrorText);
         setStories(mockImpactStories.slice(0, STORIES_TO_SHOW)); 
         toast({
-            variant: 'default',
-            title: 'Trouble Fetching Stories',
+            variant: err.code === 'permission-denied' ? 'destructive' : 'default',
+            title: toastTitle,
             description: uiErrorText,
-            duration: 7000,
+            duration: toastDuration,
         });
       } finally {
         setIsLoading(false);
@@ -118,7 +130,7 @@ export function HomepageImpactStoriesSection() {
   }
   
   if (stories.length === 0) {
-    return null; // Don't render the section if there are no stories and it's not due to an error (already handled by the block above for user-friendly message)
+    return null; 
   }
 
   return (
@@ -136,7 +148,7 @@ export function HomepageImpactStoriesSection() {
       </div>
 
       {error && ( 
-        <div className="text-center text-sm text-muted-foreground mb-6 bg-muted/50 p-3 rounded-md max-w-2xl mx-auto">
+        <div className="text-center text-sm text-muted-foreground mb-6 bg-destructive/10 p-3 rounded-md max-w-2xl mx-auto">
             <AlertTriangle className="inline-block h-4 w-4 mr-1.5 text-destructive" />
             {error}
         </div>
@@ -144,11 +156,11 @@ export function HomepageImpactStoriesSection() {
       
       <div className="flex overflow-x-auto space-x-4 md:space-x-6 py-4 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-primary/10 scrollbar-thumb-rounded-full">
         {stories.map(story => (
-          <div key={story.id} className="flex-shrink-0 w-72 sm:w-80 md:w-96"> {/* Adjusted width for consistency */}
+          <div key={story.id} className="flex-shrink-0 w-72 sm:w-80 md:w-96">
             <ImpactStoryCard story={story} />
           </div>
         ))}
-        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>} {/* Sentinel for spacing */}
+        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>}
       </div>
       
       <div className="mt-8 md:mt-12 text-center">

@@ -43,24 +43,30 @@ export default function ImpactStoriesPage() {
         if (fetchedStories.length > 0) {
             setStories(fetchedStories);
         } else {
-            // No stories from DB, but DB is connected. Show "No stories yet".
             setStories([]);
         }
       } catch (err: any) {
         console.error('Error fetching impact stories:', err);
         let uiErrorText = 'Could not load impact stories. Showing sample stories instead.';
+        let toastTitle = 'Error Fetching Stories';
+        let toastDuration = 7000;
+
         if (err.code === 'permission-denied') {
-          uiErrorText = "You don't have permission to view these stories. Showing sample stories instead.";
+          uiErrorText = "Could not load stories due to missing permissions. Please check your Firestore security rules. Showing sample stories instead.";
+          toastTitle = 'Permission Error';
+          toastDuration = 10000;
         } else if (err.code === 'failed-precondition') {
-           uiErrorText = "A Firestore index might be missing. Showing sample stories instead.";
+           uiErrorText = "A Firestore index might be missing for 'impactStories'. Showing sample stories instead.";
+           toastTitle = 'Database Index Required';
         }
+        
         setError(uiErrorText);
         setStories(mockImpactStories); 
         toast({
-            variant: 'default',
-            title: 'Error Fetching Stories',
+            variant: err.code === 'permission-denied' ? 'destructive' : 'default',
+            title: toastTitle,
             description: uiErrorText,
-            duration: 7000,
+            duration: toastDuration,
         });
       } finally {
         setIsLoading(false);
@@ -91,7 +97,6 @@ export default function ImpactStoriesPage() {
         </div>
       )}
 
-      {/* Display error message if mock stories are being shown due to an issue */}
       {!isLoading && error && stories.length > 0 && (
          <div className="mb-6 text-center bg-destructive/10 p-3 rounded-md">
           <AlertTriangle className="h-5 w-5 text-destructive inline-block mr-2" />
@@ -99,7 +104,6 @@ export default function ImpactStoriesPage() {
         </div>
       )}
       
-      {/* Handles the case where DB is connected, fetch succeeded, but no stories exist */}
       {!isLoading && !error && stories.length === 0 && (
         <div className="flex flex-col items-center justify-center py-10 md:py-12 text-center">
           <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
