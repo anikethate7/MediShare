@@ -46,7 +46,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
                 setIsSendOfferDialogOpen(true);
             } else {
                 toast({ title: "NGO details not found", variant: "destructive" });
-                setCurrentNgoDetails(initialNgoData); // Fallback to initial data
+                setCurrentNgoDetails(initialNgoData); 
                 setIsSendOfferDialogOpen(true);
             }
         } catch (error) {
@@ -67,7 +67,7 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
   return (
     <>
       <Card className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up group">
-        <div className="relative w-full h-48">
+        <div className="relative w-full h-36 sm:h-48">
           <Image
             src={currentNgoDetails.imageUrl || "https://placehold.co/600x400.png"}
             alt={`${currentNgoDetails.name} activity or premises`}
@@ -75,30 +75,30 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
             objectFit="cover"
             data-ai-hint={currentNgoDetails['data-ai-hint'] || "charity organization"}
             className="group-hover:scale-105 transition-transform duration-300"
-            priority={false} // Defer loading for offscreen images
-            loading="lazy"   // Defer loading for offscreen images
+            priority={false} 
+            loading="lazy"   
           />
         </div>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-headline text-primary flex items-center gap-2">
+        <CardHeader className="pb-2 pt-4">
+          <CardTitle className="text-lg md:text-xl font-headline text-primary flex items-center gap-2">
             {getIconForType(currentNgoDetails.type)}
             {currentNgoDetails.name}
           </CardTitle>
-          <CardDescription className="text-sm text-muted-foreground pt-1">
+          <CardDescription className="text-xs text-muted-foreground pt-1">
             <Badge variant="outline" className="mt-1 border-primary/50 text-primary">{currentNgoDetails.type}</Badge>
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-grow space-y-3 pt-2 pb-4">
-          <div className="flex items-start gap-2 text-sm text-foreground/80">
-            <MapPin className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+        <CardContent className="flex-grow space-y-2 md:space-y-3 pt-2 pb-3 md:pb-4">
+          <div className="flex items-start gap-2 text-xs md:text-sm text-foreground/80">
+            <MapPin className="h-4 w-4 md:h-5 md:w-5 text-accent flex-shrink-0 mt-0.5" />
             <span>{currentNgoDetails.address}, {currentNgoDetails.city}</span>
           </div>
-          <p className="text-sm text-foreground/90 line-clamp-3">
+          <p className="text-xs md:text-sm text-foreground/90 line-clamp-3">
             {currentNgoDetails.description}
           </p>
            {currentNgoDetails.services && currentNgoDetails.services.length > 0 && (
             <div>
-              <h4 className="text-xs font-semibold text-muted-foreground mb-1.5 flex items-center gap-1.5">
+              <h4 className="text-xs font-semibold text-muted-foreground mb-1 md:mb-1.5 flex items-center gap-1.5">
                 <Briefcase className="h-3.5 w-3.5 text-accent" />
                 Key Services:
               </h4>
@@ -111,8 +111,8 @@ const NgoCardComponent = ({ ngo: initialNgoData }: NgoCardProps) => {
             </div>
           )}
         </CardContent>
-        <CardFooter className="mt-auto border-t pt-4">
-          <Button onClick={handleViewContact} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoadingNgoDetails}>
+        <CardFooter className="mt-auto border-t pt-3 md:pt-4 pb-3 md:pb-4">
+          <Button onClick={handleViewContact} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-sm py-2.5 md:text-base md:py-3" disabled={isLoadingNgoDetails}>
             {isLoadingNgoDetails ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fetching...</>
             ) : (

@@ -68,14 +68,14 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
   return (
     <>
       <Card className="flex flex-col h-full overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-slide-in-up group">
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-2 pt-4">
           <div className="flex justify-between items-start">
-            <CardTitle className="text-xl font-headline text-primary flex items-center gap-2">
+            <CardTitle className="text-lg md:text-xl font-headline text-primary flex items-center gap-2">
               <Pill className="h-5 w-5 text-primary" /> 
               {request.medicineName}
             </CardTitle>
-            <Badge variant={getUrgencyBadgeVariant(request.urgency)} className="ml-2 shrink-0">
-              <Thermometer className="h-3.5 w-3.5 mr-1" />{request.urgency}
+            <Badge variant={getUrgencyBadgeVariant(request.urgency)} className="ml-2 shrink-0 text-xs px-2 py-0.5">
+              <Thermometer className="h-3 w-3 md:h-3.5 md:w-3.5 mr-1" />{request.urgency}
             </Badge>
           </div>
           <CardDescription className="text-xs text-muted-foreground pt-1 flex items-center">
@@ -83,7 +83,7 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
             Requested by: {request.ngoName}
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-grow space-y-3 pt-0 pb-4">
+        <CardContent className="flex-grow space-y-2 md:space-y-3 pt-0 pb-3 md:pb-4">
           <p className="text-sm text-foreground/90 line-clamp-3 flex items-start gap-2">
             <Info className="h-4 w-4 mr-0 text-accent flex-shrink-0 mt-0.5" />
             <span>{request.description}</span>
@@ -93,13 +93,13 @@ const DonationRequestCardComponent = ({ request, ngo: initialNgo, fetchNgoDetail
             <strong>Quantity Needed:</strong> {request.quantityNeeded}
           </div>
           {request.notes && (
-            <p className="text-xs text-muted-foreground italic bg-muted/30 p-2.5 rounded-md">
+            <p className="text-xs text-muted-foreground italic bg-muted/30 p-2 rounded-md">
               <strong>Notes:</strong> {request.notes}
             </p>
           )}
         </CardContent>
-        <CardFooter className="mt-auto border-t pt-3 pb-3 flex flex-col items-start space-y-2">
-          <Button onClick={handleOfferHelp} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isLoadingNgo}>
+        <CardFooter className="mt-auto border-t pt-3 pb-3 flex flex-col items-start space-y-1.5">
+          <Button onClick={handleOfferHelp} className="w-full bg-accent hover:bg-accent/90 text-accent-foreground text-sm py-2.5 md:text-base md:py-3" disabled={isLoadingNgo}>
             {isLoadingNgo ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Fetching Contact...</>
             ) : (

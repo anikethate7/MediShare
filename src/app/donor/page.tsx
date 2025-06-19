@@ -100,35 +100,35 @@ export default function DonorPage() {
   }, [toast]); 
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-6 md:space-y-8 animate-fade-in">
       <section className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-6 mx-auto w-fit">
-          <ListChecks className="h-12 w-12 text-primary" />
+        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4 md:mb-6 mx-auto w-fit">
+          <ListChecks className="h-10 w-10 md:h-12 md:w-12 text-primary" />
         </div>
-        <h1 className="text-4xl font-headline font-bold mb-2 text-primary">
+        <h1 className="text-3xl md:text-4xl font-headline font-bold mb-2 text-primary">
           Active Donation Requests
         </h1>
-        <p className="text-lg text-foreground/80 max-w-2xl mx-auto">
+        <p className="text-base md:text-lg text-foreground/80 max-w-2xl mx-auto">
           Browse current medicine needs from NGOs. Your contribution can make a significant difference!
         </p>
       </section>
 
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12 space-y-3">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <Loader2 className="h-10 w-10 md:h-12 md:w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading active requests...</p>
         </div>
       )}
 
       {!isLoading && error && (
-        <div className="flex flex-col items-center justify-center py-12 text-center bg-destructive/10 p-6 rounded-lg">
-          <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-           <h3 className="text-xl font-semibold text-destructive mb-2">
+        <div className="flex flex-col items-center justify-center py-10 md:py-12 text-center bg-destructive/10 p-4 md:p-6 rounded-lg">
+          <AlertTriangle className="h-10 w-10 md:h-12 md:w-12 text-destructive mx-auto mb-3 md:mb-4" />
+           <h3 className="text-lg md:text-xl font-semibold text-destructive mb-1 md:mb-2">
             {isIndexError ? "Database Index Required" : "Could Not Load Requests"}
           </h3>
-          <p className="text-destructive/80 max-w-md mx-auto whitespace-pre-line">{error}</p>
+          <p className="text-destructive/80 max-w-md mx-auto whitespace-pre-line text-sm md:text-base">{error}</p>
            {isIndexError && (
-            <p className="text-xs text-destructive/70 mt-3">
+            <p className="text-xs text-destructive/70 mt-2 md:mt-3">
               Please follow the instructions above or in the toast notification. The developer console (F12) will contain the direct link from Firebase.
             </p>
           )}
@@ -136,17 +136,17 @@ export default function DonorPage() {
       )}
 
       {!isLoading && !error && requests.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <Frown className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-foreground/80">No Open Requests</h3>
-          <p className="text-muted-foreground mt-2 max-w-md mx-auto">
+        <div className="flex flex-col items-center justify-center py-10 md:py-12 text-center">
+          <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
+          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Open Requests</h3>
+          <p className="text-muted-foreground mt-1 md:mt-2 max-w-md mx-auto text-sm md:text-base">
             There are currently no open donation requests. Thank you for checking!
           </p>
         </div>
       )}
 
       {!isLoading && !error && requests.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8">
           {requests.map(request => (
             <DonationRequestCard
               key={request.id}

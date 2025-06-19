@@ -121,20 +121,20 @@ export default function RegisterDonorPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] py-8 animate-fade-in">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] py-6 md:py-8 animate-fade-in">
+      <Card className="w-full max-w-md shadow-xl mx-4 sm:mx-auto">
         <CardHeader className="text-center">
-           <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-4 mx-auto w-fit">
-            <UserPlus2 className="h-10 w-10 text-accent" />
+           <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
+            <UserPlus2 className="h-8 w-8 md:h-10 md:w-10 text-accent" />
           </div>
-          <CardTitle className="text-3xl font-headline text-accent">Donor Registration</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl md:text-3xl font-headline text-accent">Donor Registration</CardTitle>
+          <CardDescription className="text-sm md:text-base">
             Create your MediShare account to help NGOs in need.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
               <FormField
                 control={form.control}
                 name="name"
@@ -169,7 +169,7 @@ export default function RegisterDonorPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <FormField
                   control={form.control}
                   name="password"
@@ -204,7 +204,7 @@ export default function RegisterDonorPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
+              <Button type="submit" className="w-full text-md md:text-lg py-3 md:py-6 bg-accent hover:bg-accent/90 text-accent-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -219,7 +219,7 @@ export default function RegisterDonorPage() {
               </Button>
             </form>
           </Form>
-           <p className="mt-6 text-center text-sm text-muted-foreground">
+           <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login-donor" className="font-medium text-accent hover:underline">
               Login here

@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, LogIn, Mail, KeyRound, Building2 } from 'lucide-react'; // Changed Building to Building2
+import { Loader2, LogIn, Mail, KeyRound, Building2 } from 'lucide-react'; 
 import React, { useTransition } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
@@ -62,7 +62,7 @@ export default function LoginNgoPage() {
           description: 'Welcome back to MediShare.',
         });
         form.reset();
-        router.push('/ngo-dashboard'); // Redirect to NGO Dashboard
+        router.push('/ngo-dashboard'); 
       } catch (error: any) {
         console.error('Error logging in NGO:', error);
         let description = 'Invalid email or password. Please try again.';
@@ -81,20 +81,20 @@ export default function LoginNgoPage() {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in py-8">
-      <Card className="w-full max-w-md shadow-xl">
+    <div className="flex justify-center items-center min-h-[calc(100vh-200px)] animate-fade-in py-6 md:py-8">
+      <Card className="w-full max-w-md shadow-xl mx-4 sm:mx-auto">
         <CardHeader className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4 mx-auto w-fit">
-            <Building2 className="h-10 w-10 text-primary" />
+          <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
+            <Building2 className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-headline text-primary">NGO Login</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl md:text-3xl font-headline text-primary">NGO Login</CardTitle>
+          <CardDescription className="text-sm md:text-base">
             Access your MediShare dashboard to manage donations.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
               <FormField
                 control={form.control}
                 name="email"
@@ -129,7 +129,7 @@ export default function LoginNgoPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
+              <Button type="submit" className="w-full text-md md:text-lg py-3 md:py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -144,7 +144,7 @@ export default function LoginNgoPage() {
               </Button>
             </form>
           </Form>
-          <p className="mt-6 text-center text-sm text-muted-foreground">
+          <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link href="/register-ngo" className="font-medium text-primary hover:underline">
               Register here

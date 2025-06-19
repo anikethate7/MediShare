@@ -24,7 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, UserPlus, Building2, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react'; // Changed Building to Building2
+import { Loader2, UserPlus, Building2, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react'; 
 import React, { useTransition } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
@@ -99,7 +99,7 @@ export default function RegisterNgoPage() {
             address: data.address,
             city: data.city,
             description: data.description,
-            contactEmail: data.email, // Store email in profile as well
+            contactEmail: data.email, 
             contactPhone: data.contactPhone,
             website: data.website,
           };
@@ -111,7 +111,7 @@ export default function RegisterNgoPage() {
             description: 'Your NGO account has been created. Please login.',
           });
           form.reset();
-          router.push('/login-ngo'); // Redirect to NGO login
+          router.push('/login-ngo'); 
         } else {
           console.error('Registration: Firebase user object is null after successful creation call.');
           toast({
@@ -148,20 +148,20 @@ export default function RegisterNgoPage() {
   }
 
   return (
-    <div className="flex justify-center py-8 animate-fade-in">
-      <Card className="w-full max-w-2xl shadow-xl">
+    <div className="flex justify-center py-6 md:py-8 animate-fade-in">
+      <Card className="w-full max-w-lg md:max-w-2xl shadow-xl mx-4 sm:mx-auto">
         <CardHeader className="text-center">
-          <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-4 mx-auto w-fit">
-            <UserPlus className="h-10 w-10 text-primary" />
+          <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
+            <UserPlus className="h-8 w-8 md:h-10 md:w-10 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-headline text-primary">Register Your NGO</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl md:text-3xl font-headline text-primary">Register Your NGO</CardTitle>
+          <CardDescription className="text-sm md:text-base">
             Join MediShare to connect with donors and manage your medicine needs.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
               <FormField
                 control={form.control}
                 name="ngoName"
@@ -196,7 +196,7 @@ export default function RegisterNgoPage() {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <FormField
                   control={form.control}
                   name="password"
@@ -248,7 +248,7 @@ export default function RegisterNgoPage() {
                 )}
               />
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                 <FormField
                   control={form.control}
                   name="city"
@@ -336,12 +336,12 @@ export default function RegisterNgoPage() {
                          <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Textarea
                           placeholder="Briefly describe your NGO's mission, activities, and the types of medicines you typically need."
-                          className="resize-y min-h-[120px] pl-10"
+                          className="resize-y min-h-[100px] md:min-h-[120px] pl-10"
                           {...field}
                         />
                       </div>
                     </FormControl>
-                    <FormDescription>
+                    <FormDescription className="text-xs md:text-sm">
                       This information will be visible to potential donors.
                     </FormDescription>
                     <FormMessage />
@@ -349,7 +349,7 @@ export default function RegisterNgoPage() {
                 )}
               />
 
-              <Button type="submit" className="w-full text-lg py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
+              <Button type="submit" className="w-full text-md md:text-lg py-3 md:py-6 bg-primary hover:bg-primary/90 text-primary-foreground" disabled={isPending}>
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
