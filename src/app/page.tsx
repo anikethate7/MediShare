@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, UserCircle, Building2 } from 'lucide-react'; 
+import { ArrowRight, UserCircle, Building2 } from 'lucide-react';
 import { HomepageImpactStoriesSection } from '@/components/HomepageImpactStoriesSection';
 
 export default function HomePage() {
