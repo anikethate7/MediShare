@@ -160,9 +160,3 @@ export default function ViewRequestsPage() {
     </div>
   );
 }
-
-// Removed metadata export as it's not allowed in client components
-// export const metadata = {
-//   title: 'Legacy - Active Donation Requests - MediShare',
-//   description: 'Browse and respond to current medicine donation needs from NGOs.',
-// };
