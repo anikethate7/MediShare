@@ -3,28 +3,24 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Default deny all reads and writes if no other rules match
-    // match /{allPaths=**} {
-    //   allow read, write: if false;
-    // }
-
-    // Rules for NGO profile images (example, if you add this feature)
-    // match /ngo_profile_images/{ngoUid}/{fileName} {
-    //   allow read: if true;
-    //   allow write: if request.auth != null && request.auth.uid == ngoUid;
-    // }
-
-    // Rules for Impact Story images
-    // - Allow authenticated NGOs to write (upload) to a path specific to their UID.
-    // - This prevents one NGO from uploading images into another NGO's story folder.
-    // - File size and type checks can also be added here if needed (e.g., request.resource.size < 5 * 1024 * 1024)
-    // - Allow public read access for these images.
-    match /impact_stories/{ngoUid}/{fileName} {
-      allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == ngoUid;
+    
+    // Rule for NGO profile images or other general NGO files
+    // Allow an authenticated NGO to write to a folder matching their user ID.
+    match /ngos/{userId}/{allPaths=**} {
+      allow write: if request.auth != null && request.auth.uid == userId;
     }
 
-    // Add other storage rules as needed for your application
+    // Public read access for all files in the 'ngos' directory.
+    // This is useful for displaying profile pictures, etc.
+    match /ngos/{userId}/{allPaths=**} {
+      allow read: if true;
+    }
+
+    // You can add rules for other directories here if needed in the future.
+    // For example, if donors could upload files:
+    // match /donors/{userId}/{allPaths=**} {
+    //   allow write: if request.auth != null && request.auth.uid == userId;
+    //   allow read: if request.auth != null && request.auth.uid == userId;
+    // }
   }
 }
-    
