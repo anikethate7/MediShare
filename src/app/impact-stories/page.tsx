@@ -78,20 +78,14 @@ export default function ImpactStoriesPage() {
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in">
       <section className="text-center">
-        <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-4 md:mb-6 mx-auto w-fit">
-          <BookOpenText className="h-10 w-10 md:h-12 md:w-12 text-accent" />
-        </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-headline font-bold mb-2 text-accent">
-          All Impact Stories
+        <h1 className="text-3xl sm:text-4xl font-headline font-bold uppercase tracking-wider text-primary">
+          Support a Cause
         </h1>
-        <p className="text-sm sm:text-base md:text-lg text-foreground/80 max-w-2xl mx-auto">
-          Discover how donations through MediShare are making a real difference in communities, as shared by NGOs.
-        </p>
       </section>
 
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12 space-y-3">
-          <Loader2 className="h-10 w-10 md:h-12 md:w-12 animate-spin text-accent" />
+          <Loader2 className="h-10 w-10 md:h-12 md:w-12 animate-spin text-primary" />
           <p className="text-muted-foreground">Loading stories...</p>
         </div>
       )}
@@ -114,7 +108,7 @@ export default function ImpactStoriesPage() {
       )}
 
       {!isLoading && stories.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 md:gap-x-6 gap-y-6 md:gap-y-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
           {stories.map(story => (
             <ImpactStoryCard key={story.id} story={story} />
           ))}

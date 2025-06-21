@@ -12,12 +12,12 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { mockImpactStories } from '@/data/mockData';
 
-const STORIES_TO_SHOW = 3; 
+const STORIES_TO_SHOW = 4; 
 
 export function HomepageImpactStoriesSection() {
   const [stories, setStories] = useState<ImpactStory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [statusMessage, setStatusMessage] = useState<string | null>(null); // Renamed from error for clarity
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export function HomepageImpactStoriesSection() {
            toastTitle = 'Database Index Required';
         }
         
-        setStatusMessage(uiErrorText); // Use statusMessage to display issues
+        setStatusMessage(uiErrorText); 
         setStories(mockImpactStories.slice(0, STORIES_TO_SHOW)); 
         toast({
             variant: err.code === 'permission-denied' ? 'destructive' : 'default',
@@ -82,47 +82,14 @@ export function HomepageImpactStoriesSection() {
 
   if (isLoading) {
     return (
-      <section className="w-full mx-auto py-8 md:py-12">
-        <div className="text-center mb-6 md:mb-8">
-          <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
-            <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
-          </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
-            Making a Difference
+      <section className="w-full max-w-6xl mx-auto py-12 md:py-16">
+        <div className="text-center mb-10 md:mb-12">
+          <h2 className="text-3xl sm:text-4xl font-headline font-bold uppercase tracking-wider text-primary">
+            Support a Cause
           </h2>
         </div>
-        <div className="flex flex-col items-center justify-center py-10 space-y-3">
-          <Loader2 className="h-8 w-8 md:h-10 md:w-10 animate-spin text-accent" />
-          <p className="text-sm text-muted-foreground">Loading recent stories...</p>
-        </div>
-      </section>
-    );
-  }
-  
-  if (stories.length === 0 && !statusMessage) { 
-    return (
-      <section className="w-full mx-auto py-8 md:py-12">
-        <div className="text-center mb-6 md:mb-8">
-           <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
-            <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
-          </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent">
-            Making a Difference
-          </h2>
-        </div>
-        <div className="flex flex-col items-center justify-center py-10 text-center">
-          <Frown className="h-12 w-12 md:h-16 md:w-16 text-muted-foreground mx-auto mb-3 md:mb-4" />
-          <h3 className="text-lg md:text-xl font-semibold text-foreground/80">No Impact Stories Available</h3>
-          <p className="text-muted-foreground mt-1 md:mt-2 max-w-md mx-auto text-sm md:text-base">
-            Check back soon to see how donations are helping!
-          </p>
-        </div>
-         <div className="mt-8 md:mt-12 text-center">
-            <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent/10 hover:text-accent text-sm sm:text-base">
-            <Link href="/impact-stories">
-                View All Impact Stories <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-            </Button>
+        <div className="flex justify-center py-10">
+            <Loader2 className="h-10 w-10 animate-spin text-primary" />
         </div>
       </section>
     );
@@ -133,17 +100,11 @@ export function HomepageImpactStoriesSection() {
   }
 
   return (
-    <section className="w-full mx-auto py-10 md:py-16 animate-fade-in">
-      <div className="text-center mb-6 md:mb-10">
-        <div className="inline-flex items-center justify-center p-3 bg-accent/10 rounded-full mb-3 md:mb-4 mx-auto w-fit">
-          <BookOpenText className="h-8 w-8 md:h-10 md:w-10 text-accent" />
-        </div>
-        <h2 className="text-xl sm:text-2xl md:text-3xl font-headline font-bold text-accent mb-1 md:mb-2">
-          Making a Difference
+    <section className="w-full max-w-6xl mx-auto py-12 md:py-16 animate-fade-in">
+      <div className="text-center mb-10 md:mb-12">
+        <h2 className="text-3xl sm:text-4xl font-headline font-bold uppercase tracking-wider text-primary">
+          Support a Cause
         </h2>
-        <p className="text-xs sm:text-sm md:text-base text-foreground/70 max-w-lg mx-auto">
-          See how donations through MediShare are changing lives.
-        </p>
       </div>
 
       {statusMessage && ( 
@@ -153,18 +114,10 @@ export function HomepageImpactStoriesSection() {
         </div>
       )}
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-8">
         {stories.map(story => (
           <ImpactStoryCard key={story.id} story={story} />
         ))}
-      </div>
-      
-      <div className="mt-8 md:mt-12 text-center">
-        <Button asChild variant="outline" size="lg" className="border-accent text-accent hover:bg-accent/10 hover:text-accent text-sm sm:text-base">
-          <Link href="/impact-stories">
-            View All Impact Stories <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
       </div>
     </section>
   );
