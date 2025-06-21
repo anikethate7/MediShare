@@ -19,11 +19,12 @@ import React, { useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import type { Donor } from '@/types';
 import { useAuth } from '@/context/AuthContext';
+import { GoogleIcon } from '@/components/GoogleIcon';
 
 const registerDonorFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.').max(50, 'Name must not exceed 50 characters.'),
@@ -64,6 +65,46 @@ export default function RegisterDonorPage() {
       confirmPassword: '',
     },
   });
+
+  async function handleGoogleSignIn() {
+    if (firebaseInitError || !firebaseAuth || !firebaseDb) {
+      toast({ variant: 'destructive', title: 'Firebase Configuration Error', description: firebaseInitError?.message || 'Firebase is not configured correctly.', duration: 10000 });
+      return;
+    }
+    const provider = new GoogleAuthProvider();
+    startTransition(async () => {
+      try {
+        const result = await signInWithPopup(firebaseAuth, provider);
+        const user = result.user;
+        const donorDocRef = doc(firebaseDb, 'donors', user.uid);
+        const donorDocSnap = await getDoc(donorDocRef);
+
+        if (!donorDocSnap.exists()) {
+          const newDonorProfile = {
+            uid: user.uid,
+            name: user.displayName || 'Anonymous Donor',
+            email: user.email,
+            role: 'donor' as const,
+            createdAt: serverTimestamp(),
+          };
+          await setDoc(donorDocRef, newDonorProfile);
+          toast({ title: 'Welcome!', description: 'Your new donor account has been created with Google.' });
+        } else {
+          toast({ title: 'Login Successful!', description: `Welcome back, ${user.displayName || 'Donor'}!` });
+        }
+        router.push('/donor-dashboard');
+      } catch (error: any) {
+        console.error('Error with Google Sign-In:', error);
+        let description = 'Could not sign in with Google. Please try again.';
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          description = 'An account already exists with this email. Please sign in with your original method.';
+        } else if (error.code) {
+          description = error.message;
+        }
+        toast({ variant: 'destructive', title: 'Sign-In Failed', description: description });
+      }
+    });
+  }
 
   async function onSubmit(data: RegisterDonorFormValues) {
     if (firebaseInitError || !firebaseAuth || !firebaseDb) {
@@ -234,12 +275,35 @@ export default function RegisterDonorPage() {
                 ) : (
                   <>
                     <UserPlus2 className="mr-2 h-5 w-5" />
-                    Register as Donor
+                    Register with Email
                   </>
                 )}
               </Button>
             </form>
           </Form>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                Or sign up with
+              </span>
+            </div>
+          </div>
+          
+          <Button variant="outline" className="w-full py-3 md:py-6" onClick={handleGoogleSignIn} disabled={isPending}>
+            {isPending ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <GoogleIcon className="mr-3 h-5 w-5" />
+                Sign up with Google
+              </>
+            )}
+          </Button>
+
            <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-muted-foreground">
             Already have an account?{' '}
             <Link href="/login-donor" className="font-medium text-accent hover:underline">

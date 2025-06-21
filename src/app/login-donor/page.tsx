@@ -18,10 +18,12 @@ import { Loader2, LogIn, Mail, KeyRound, UserCircle } from 'lucide-react';
 import React, { useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+import { GoogleIcon } from '@/components/GoogleIcon';
 
 const loginDonorFormSchema = z.object({
   email: z.string().email('Invalid email address.'),
@@ -55,6 +57,46 @@ export default function LoginDonorPage() {
       password: '',
     },
   });
+
+  async function handleGoogleSignIn() {
+    if (firebaseInitError || !firebaseAuth || !firebaseDb) {
+      toast({ variant: 'destructive', title: 'Firebase Configuration Error', description: firebaseInitError?.message || 'Firebase is not configured correctly.', duration: 10000 });
+      return;
+    }
+    const provider = new GoogleAuthProvider();
+    startTransition(async () => {
+      try {
+        const result = await signInWithPopup(firebaseAuth, provider);
+        const user = result.user;
+        const donorDocRef = doc(firebaseDb, 'donors', user.uid);
+        const donorDocSnap = await getDoc(donorDocRef);
+
+        if (!donorDocSnap.exists()) {
+          const newDonorProfile = {
+            uid: user.uid,
+            name: user.displayName || 'Anonymous Donor',
+            email: user.email,
+            role: 'donor' as const,
+            createdAt: serverTimestamp(),
+          };
+          await setDoc(donorDocRef, newDonorProfile);
+          toast({ title: 'Welcome!', description: 'Your new donor account has been created with Google.' });
+        } else {
+          toast({ title: 'Login Successful!', description: `Welcome back, ${user.displayName || 'Donor'}!` });
+        }
+        router.push('/donor-dashboard');
+      } catch (error: any) {
+        console.error('Error with Google Sign-In:', error);
+        let description = 'Could not sign in with Google. Please try again.';
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          description = 'An account already exists with this email. Please sign in with your original method.';
+        } else if (error.code) {
+          description = error.message;
+        }
+        toast({ variant: 'destructive', title: 'Sign-In Failed', description: description });
+      }
+    });
+  }
 
   async function onSubmit(data: LoginDonorFormValues) {
     if (firebaseInitError || !firebaseAuth) {
@@ -112,7 +154,7 @@ export default function LoginDonorPage() {
           </div>
           <CardTitle className="text-2xl md:text-3xl font-headline text-accent">Donor Login</CardTitle>
           <CardDescription className="text-sm md:text-base">
-            Access your MediShare dashboard to view requests and manage your activity.
+            Access your MediShare dashboard to view requests.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -161,12 +203,35 @@ export default function LoginDonorPage() {
                 ) : (
                   <>
                     <LogIn className="mr-2 h-5 w-5" />
-                    Login
+                    Login with Email
                   </>
                 )}
               </Button>
             </form>
           </Form>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+          
+          <Button variant="outline" className="w-full py-3 md:py-6" onClick={handleGoogleSignIn} disabled={isPending}>
+            {isPending ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <>
+                <GoogleIcon className="mr-3 h-5 w-5" />
+                Sign in with Google
+              </>
+            )}
+          </Button>
+
           <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
             <Link href="/register-donor" className="font-medium text-accent hover:underline">
