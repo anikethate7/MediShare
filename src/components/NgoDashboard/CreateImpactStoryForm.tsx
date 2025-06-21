@@ -30,7 +30,7 @@ import { Loader2, BookOpen, FileText, Feather, ImageIcon, Upload, X, AlertCircle
 import { useToast } from '@/hooks/use-toast';
 import { db as firebaseDb, storage as firebaseStorage, firebaseInitError } from '@/lib/firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, type UploadTask } from "firebase/storage";
 import Image from 'next/image';
 
 const createStoryFormSchema = z.object({
@@ -119,43 +119,46 @@ export function CreateImpactStoryForm({
     startTransition(async () => {
       let imageUrl = '';
 
+      // --- New, more robust upload logic ---
       if (selectedFile) {
         setUploadProgress(0);
         const storageRef = ref(firebaseStorage, `impact_stories/${ngoUid}/${Date.now()}_${selectedFile.name}`);
-        const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+        const uploadTask: UploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+        // Listen for progress updates separately
+        uploadTask.on('state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setUploadProgress(progress);
+          }
+        );
 
         try {
-          await new Promise<void>((resolve, reject) => {
-            uploadTask.on('state_changed',
-              (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadProgress(progress);
-              },
-              (error) => {
-                console.error("Upload Error:", error);
-                let description = 'Image upload failed. This can be caused by network issues or a server problem. Please try again.';
-                
-                if (error.code === 'storage/unauthorized') {
-                    description = "Permission denied. Please ensure your Firebase Storage rules allow uploads for authenticated users.";
-                } else if (error.message.includes("Cors") || error.code === 'storage/unknown') {
-                    description = "A CORS policy error occurred. This is a cloud configuration issue. Please ensure your Storage bucket's CORS settings in the Google Cloud console are configured to allow requests from your app's domain.";
-                }
+          // Await the completion of the upload
+          await uploadTask;
+          
+          // Get the download URL once the upload is complete
+          imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
-                setUploadError(description);
-                toast({ variant: 'destructive', title: 'Upload Failed', description: "See the error message in the form for details.", duration: 15000 });
-                reject(error);
-              },
-              async () => {
-                imageUrl = await getDownloadURL(uploadTask.snapshot.ref);
-                resolve();
-              }
-            );
-          });
-        } catch (error) {
+        } catch (error: any) {
+          console.error("Upload Error:", error);
+          let description = 'Image upload failed. Please try again.';
+
+          if (error.code === 'storage/unauthorized') {
+            description = "Permission denied. Please ensure your Firebase Storage rules allow uploads for authenticated users (check the 'storage.rules' file).";
+          } else if (error.code === 'storage/canceled') {
+            description = "Upload was canceled.";
+          } else if (error.code === 'storage/unknown' || error.message.includes("Cors")) {
+            description = "A CORS policy error occurred. This is a cloud configuration issue. Please ensure your Storage bucket's CORS settings in Google Cloud are configured to allow requests from your app's domain.";
+          }
+          
+          setUploadError(description);
+          toast({ variant: 'destructive', title: 'Upload Failed', description: "See the error message in the form for details.", duration: 15000 });
           setUploadProgress(null);
-          return; // Stop form submission if upload fails
+          return; // Stop the form submission if upload fails
         }
       }
+      // --- End of new upload logic ---
 
       try {
         await addDoc(collection(firebaseDb, 'impactStories'), {
@@ -249,7 +252,7 @@ export function CreateImpactStoryForm({
             <FormDescription>Select an image from your device (max 5MB).</FormDescription>
             {uploadError && (
                  <div className="flex items-start gap-2 p-2 text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
-                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                     <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
                     <p className="text-sm font-medium">{uploadError}</p>
                 </div>
             )}
