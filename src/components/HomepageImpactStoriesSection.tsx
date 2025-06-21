@@ -99,7 +99,6 @@ export function HomepageImpactStoriesSection() {
     );
   }
   
-  // No stories to show at all (neither fetched nor mock, which shouldn't happen with current logic unless mockImpactStories is empty)
   if (stories.length === 0 && !statusMessage) { 
     return (
       <section className="w-full mx-auto py-8 md:py-12">
@@ -129,7 +128,6 @@ export function HomepageImpactStoriesSection() {
     );
   }
   
-  // If mock data is empty and no status message, effectively hide.
   if (stories.length === 0) {
     return null; 
   }
@@ -155,13 +153,10 @@ export function HomepageImpactStoriesSection() {
         </div>
       )}
       
-      <div className="flex overflow-x-auto space-x-4 md:space-x-6 py-4 scrollbar-thin scrollbar-thumb-primary/50 scrollbar-track-primary/10 scrollbar-thumb-rounded-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         {stories.map(story => (
-          <div key={story.id} className="flex-shrink-0 w-72 sm:w-80 md:w-96">
-            <ImpactStoryCard story={story} />
-          </div>
+          <ImpactStoryCard key={story.id} story={story} />
         ))}
-        {stories.length > 0 && <div className="flex-shrink-0 w-1"></div>}
       </div>
       
       <div className="mt-8 md:mt-12 text-center">
