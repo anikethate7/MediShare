@@ -4,7 +4,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ArrowRight, UserCircle, Building2, HeartPulse } from 'lucide-react';
 import { LatestRequestsSection } from '@/components/LatestRequestsSection';
-import { HomepageImpactStoriesSection } from '@/components/HomepageImpactStoriesSection';
 // The db import and getUrgentRequestsFlag are no longer needed here as the hero section will always show.
 // Firestore checks for urgent requests are handled within LatestRequestsSection.
 
@@ -72,7 +71,6 @@ export default async function HomePage() {
       </section>
 
       <LatestRequestsSection />
-      <HomepageImpactStoriesSection />
 
     </div>
   );

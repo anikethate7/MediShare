@@ -1,6 +1,5 @@
 
-import type { NGO, ImpactStory } from '@/types';
-import type { Timestamp } from 'firebase/firestore';
+import type { NGO } from '@/types';
 
 // Note: With Firebase integration, this mock data will primarily be for display if
 // Firestore data isn't fetched or if you want initial placeholders.
@@ -102,66 +101,3 @@ export const mockNgos: NGO[] = [
 ];
 
 export const ngoTypes: NGO['type'][] = ['Medical Facility', 'Community Health', 'Disaster Relief', 'General Welfare', 'Animal Welfare'];
-
-// Helper to create a mock Timestamp-like object for client-side rendering
-const createMockTimestamp = (date: Date): Timestamp => ({
-  toDate: () => date,
-  seconds: Math.floor(date.getTime() / 1000),
-  nanoseconds: (date.getTime() % 1000) * 1000000,
-  isEqual: function (other: Timestamp): boolean {
-    return this.seconds === other.seconds && this.nanoseconds === other.nanoseconds;
-  },
-  valueOf: function (): string {
-    return `Timestamp(seconds=${this.seconds}, nanoseconds=${this.nanoseconds})`;
-  },
-  toJSON: function (): { seconds: number; nanoseconds: number; } {
-    return { seconds: this.seconds, nanoseconds: this.nanoseconds };
-  },
-  toString: function (): string {
-     return `Timestamp(seconds=${this.seconds}, nanoseconds=${this.nanoseconds})`;
-  },
-});
-
-
-export const mockImpactStories: ImpactStory[] = [
-  {
-    id: 'story1',
-    ngoUid: 'mock-uid-asha-health',
-    ngoName: 'Asha Health Clinic',
-    title: 'Critical Medicines Arrived Just In Time!',
-    storyContent: "Thanks to a generous donation of antibiotics through MediShare, we were able to treat a sudden outbreak of infections in the community. Many children's lives were positively impacted. This platform truly makes a difference!",
-    imageUrl: 'https://placehold.co/600x350.png', // Slightly different size for variety
-    'data-ai-hint': 'doctor child',
-    createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 2)), // 2 days ago
-  },
-  {
-    id: 'story2',
-    ngoUid: 'mock-uid-seva-community',
-    ngoName: 'Seva Community Centre',
-    title: 'Elderly Care Program Enhanced',
-    storyContent: "The regular supply of vitamins and common pain relievers we received has greatly helped our elderly care program. Our seniors are feeling better and more active. We are grateful for the continuous support from donors.",
-    imageUrl: 'https://placehold.co/600x400.png',
-    'data-ai-hint': 'elderly people happy', // More specific hint
-    createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 5)), // 5 days ago
-  },
-  {
-    id: 'story3',
-    ngoUid: 'mock-uid-sahayata-relief',
-    ngoName: 'Sahayata Disaster Relief',
-    title: 'First-Aid Kits Made a Huge Difference',
-    storyContent: "During the recent flash floods, the first-aid supplies donated via MediShare were invaluable. Our team could provide immediate assistance to many injured individuals. Thank you for helping us respond effectively!",
-    imageUrl: undefined, // This story will use the default placeholder
-    'data-ai-hint': 'emergency aid', // This hint will be used for the default placeholder
-    createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 10)), // 10 days ago
-  },
-  {
-    id: 'story4',
-    ngoUid: 'mock-uid-manav-kalyan',
-    ngoName: 'Manav Kalyan Sanstha',
-    title: 'Supporting Health Camps',
-    storyContent: "With the medicines collected through MediShare, we successfully organized a health camp in a remote village, providing essential care to over 200 people. The platform has been instrumental in our outreach efforts.",
-    imageUrl: 'https://placehold.co/500x300.png',
-    'data-ai-hint': 'medical camp',
-    createdAt: createMockTimestamp(new Date(Date.now() - 24 * 60 * 60 * 1000 * 15)), // 15 days ago
-  },
-];

@@ -6,10 +6,9 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, LayoutDashboard, AlertTriangle, BookHeart } from 'lucide-react';
+import { Loader2, LayoutDashboard, AlertTriangle } from 'lucide-react';
 import { EditProfileForm } from '@/components/NgoDashboard/EditProfileForm';
 import { DonationRequestsSection } from '@/components/NgoDashboard/DonationRequestsSection';
-import { ImpactStoriesSection } from '@/components/NgoDashboard/ImpactStoriesSection';
 
 
 export default function NgoDashboardPage() {
@@ -75,16 +74,12 @@ export default function NgoDashboardPage() {
       </section>
 
       <Tabs defaultValue="donation-requests" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
+        <TabsList className="grid w-full grid-cols-2 max-w-xs sm:max-w-sm md:max-w-md mx-auto">
           <TabsTrigger value="donation-requests">Donation Requests</TabsTrigger>
-          <TabsTrigger value="impact-stories">Impact Stories</TabsTrigger>
           <TabsTrigger value="edit-profile">Edit Profile</TabsTrigger>
         </TabsList>
         <TabsContent value="donation-requests">
           <DonationRequestsSection />
-        </TabsContent>
-        <TabsContent value="impact-stories">
-          <ImpactStoriesSection />
         </TabsContent>
         <TabsContent value="edit-profile">
           <Card className="mt-4 md:mt-6 shadow-lg">
