@@ -1,9 +1,52 @@
 
 import { NgoListClient } from '@/components/NgoListClient';
-import { SearchCode } from 'lucide-react'; 
-import { mockNgos } from '@/data/mockData'; 
+import { SearchCode, AlertTriangle } from 'lucide-react';
+import { db } from '@/lib/firebase/config';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import type { NGO } from '@/types';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
-export default function BrowseNgosPage() {
+async function fetchNgos(): Promise<{ data: NGO[], error: string | null }> {
+  if (!db) {
+    const errorMessage = "Firebase DB is not initialized. Cannot fetch NGOs.";
+    console.error(errorMessage);
+    return { data: [], error: errorMessage };
+  }
+  try {
+    const ngosCollection = collection(db, 'ngos');
+    const q = query(ngosCollection, orderBy('name', 'asc'));
+    const ngoSnapshot = await getDocs(q);
+
+    if (ngoSnapshot.empty) {
+        return { data: [], error: null };
+    }
+    
+    const ngosList = ngoSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        uid: doc.id, // The document ID is the UID
+        ...data
+      } as NGO;
+    });
+
+    return { data: ngosList, error: null };
+  } catch (error: any) {
+    console.error("Error fetching NGOs:", error);
+    let errorMessage = "An unexpected error occurred while fetching NGOs.";
+    if (error.code === 'permission-denied') {
+      errorMessage = "Permission denied. Please check your Firestore security rules to allow public read access to the 'ngos' collection.";
+    } else if (error.code === 'failed-precondition') {
+        errorMessage = "A Firestore index is missing. Check your browser's developer console (F12) for a Firebase link to create the required index for ordering NGOs.";
+    }
+    return { data: [], error: errorMessage };
+  }
+}
+
+
+export default async function BrowseNgosPage() {
+  const { data: registeredNgos, error } = await fetchNgos();
+
   return (
     <div className="space-y-6 md:space-y-8 animate-fade-in">
       <section className="text-center">
@@ -18,7 +61,17 @@ export default function BrowseNgosPage() {
         </p>
       </section>
       
-      <NgoListClient initialNgos={mockNgos} />
+      {error ? (
+        <Alert variant="destructive" className="max-w-xl mx-auto">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error Loading NGOs</AlertTitle>
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
+      ) : (
+        <NgoListClient initialNgos={registeredNgos} />
+      )}
     </div>
   );
 }
