@@ -20,6 +20,9 @@ const ptSans = PT_Sans({
   variable: '--font-pt-sans',
 });
 
+// The Base64 encoded SVG for the HeartPulse icon with the accent color #26A69A
+const faviconHref = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjZBNjlBIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+PHBhdGggZD0iTTE5IDE0YzEuNDktMS40NiAzLTMuMjEgMy01LjVBNS41IDUuNSAwIDAgMCAxNi41IDNjLTEuNzYgMC0zIC41LTQuNSAyLTEuNS0xLjUtMi43NC0yLTQuNS0yQTUuNSA1LjUgMCAwIDAgMiA4LjVjMCAyLjMgMS41IDQuMDUgMyA1LjVsNyA3WiIvPjxwYXRoIGQ9Ik0zLjIyIDEySDkuNWwudDcxIDEuNzFhLjUuNSAwIDAgMCAuODUgMGwudDcxLTEuNzFIMTUiLz48L3N2Zz4=";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -29,6 +32,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className={`${ptSans.variable}`}>
       <head>
         {/* Google Font links removed, handled by next/font */}
+        <link rel="icon" href={faviconHref} type="image/svg+xml" />
       </head>
       <body className="font-body antialiased flex flex-col min-h-screen">
         <AuthProvider>
