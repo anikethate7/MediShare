@@ -26,7 +26,7 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Loader2, BookOpen, FileText, Feather, ImageIcon, Upload, X } from 'lucide-react';
+import { Loader2, BookOpen, FileText, Feather, ImageIcon, Upload, X, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { db as firebaseDb, storage as firebaseStorage, firebaseInitError } from '@/lib/firebase/config';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -59,6 +59,8 @@ export function CreateImpactStoryForm({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
 
   const form = useForm<CreateStoryFormValues>({
     resolver: zodResolver(createStoryFormSchema),
@@ -70,14 +72,11 @@ export function CreateImpactStoryForm({
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUploadError(null);
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({
-          variant: 'destructive',
-          title: 'File Too Large',
-          description: 'Please select an image file smaller than 5MB.',
-        });
+        setUploadError('File is too large. Please select an image smaller than 5MB.');
         return;
       }
       setSelectedFile(file);
@@ -93,6 +92,7 @@ export function CreateImpactStoryForm({
     setSelectedFile(null);
     setPreviewUrl(null);
     setUploadProgress(null);
+    setUploadError(null);
   };
 
   const handleCancel = () => {
@@ -101,11 +101,17 @@ export function CreateImpactStoryForm({
   };
 
   async function onSubmit(data: CreateStoryFormValues) {
+    setUploadError(null);
     if (firebaseInitError || !firebaseDb || !firebaseStorage) {
+        let errorDesc = firebaseInitError?.message || 'Firebase is not configured correctly. Cannot create story.';
+        if (!firebaseStorage) {
+            errorDesc = "Firebase Storage is not configured. Please ensure NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET is set in your .env.local file and is correct.";
+        }
         toast({
             variant: 'destructive',
             title: 'Configuration Error',
-            description: firebaseInitError?.message || 'Firebase is not configured correctly. Cannot create story.',
+            description: errorDesc,
+            duration: 10000,
         });
         return;
     }
@@ -127,13 +133,16 @@ export function CreateImpactStoryForm({
               },
               (error) => {
                 console.error("Upload Error:", error);
-                let description = 'Image upload failed. Please try again.';
+                let description = 'Image upload failed. This can be caused by network issues or a server problem. Please try again.';
+                
                 if (error.code === 'storage/unauthorized') {
-                    description = "Permission denied. Check Firebase Storage rules to ensure you can upload files.";
-                } else if (error.message.includes("Cors")) {
-                    description = "CORS policy error. Check your Storage bucket's CORS configuration in the Google Cloud console to allow requests from your app's domain.";
+                    description = "Permission denied. Please ensure your Firebase Storage rules allow uploads for authenticated users.";
+                } else if (error.message.includes("Cors") || error.code === 'storage/unknown') {
+                    description = "A CORS policy error occurred. This is a cloud configuration issue. Please ensure your Storage bucket's CORS settings in the Google Cloud console are configured to allow requests from your app's domain.";
                 }
-                toast({ variant: 'destructive', title: 'Upload Failed', description, duration: 10000 });
+
+                setUploadError(description);
+                toast({ variant: 'destructive', title: 'Upload Failed', description: "See the error message in the form for details.", duration: 15000 });
                 reject(error);
               },
               async () => {
@@ -238,6 +247,12 @@ export function CreateImpactStoryForm({
                 disabled={isPending}
              />
             <FormDescription>Select an image from your device (max 5MB).</FormDescription>
+            {uploadError && (
+                 <div className="flex items-start gap-2 p-2 text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                     <AlertCircle className="h-5 w-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">{uploadError}</p>
+                </div>
+            )}
           </div>
 
           {previewUrl && (
@@ -259,6 +274,7 @@ export function CreateImpactStoryForm({
                     onClick={() => {
                         setSelectedFile(null);
                         setPreviewUrl(null);
+                        setUploadError(null);
                         const fileInput = document.getElementById('image-upload') as HTMLInputElement;
                         if(fileInput) fileInput.value = "";
                     }}

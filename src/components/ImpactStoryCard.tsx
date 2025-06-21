@@ -14,10 +14,13 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
     const defaultPlaceholder = 'https://placehold.co/600x400.png';
     const defaultHint = 'community event';
 
-    if (story.imageUrl) {
+    // Check for a valid, fully-formed URL starting with http
+    if (story.imageUrl && story.imageUrl.startsWith('http')) {
       try {
         const url = new URL(story.imageUrl);
         const allowedHosts = ['placehold.co', 'firebasestorage.googleapis.com'];
+        
+        // Ensure the hostname is in our allowed list for next/image
         if (allowedHosts.includes(url.hostname)) {
           return {
             src: story.imageUrl,
@@ -25,12 +28,14 @@ export function ImpactStoryCard({ story }: ImpactStoryCardProps) {
           };
         }
       } catch (e) {
+        // This will catch errors from `new URL()` if the URL is malformed
         console.warn(
-          `Invalid image URL for story "${story.title}": ${story.imageUrl}`
+          `Invalid image URL provided for story "${story.title}": ${story.imageUrl}`
         );
       }
     }
 
+    // Fallback case if no valid URL is found
     return {
       src: defaultPlaceholder,
       hint: story['data-ai-hint'] || defaultHint,
