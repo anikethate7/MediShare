@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, UserPlus2, Mail, KeyRound, User } from 'lucide-react';
-import React, { useTransition } from 'react';
+import React, { useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib/firebase/config';
@@ -24,6 +23,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import type { Donor } from '@/types';
+import { useAuth } from '@/context/AuthContext';
 
 const registerDonorFormSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.').max(50, 'Name must not exceed 50 characters.'),
@@ -41,6 +41,19 @@ export default function RegisterDonorPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
+  const { currentUser, userRole, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (currentUser) {
+        if (userRole === 'donor') {
+          router.push('/donor-dashboard');
+        } else if (userRole === 'ngo') {
+          router.push('/ngo-dashboard');
+        }
+      }
+    }
+  }, [currentUser, userRole, authLoading, router]);
 
   const form = useForm<RegisterDonorFormValues>({
     resolver: zodResolver(registerDonorFormSchema),
@@ -69,7 +82,7 @@ export default function RegisterDonorPage() {
         const user = userCredential.user;
 
         if (user) {
-          const donorData: Omit<Donor, 'id'> = { 
+          const donorData: Omit<Donor, 'id'> = {
             uid: user.uid,
             name: data.name,
             email: data.email,
@@ -84,7 +97,7 @@ export default function RegisterDonorPage() {
             description: 'Your donor account has been created. Please login.',
           });
           form.reset();
-          router.push('/login-donor'); 
+          router.push('/login-donor');
         } else {
           console.error('Registration: Firebase user object is null after successful creation call.');
           toast({
@@ -105,7 +118,7 @@ export default function RegisterDonorPage() {
           description = 'The password is too weak. Please choose a stronger password.';
         } else if (error.code === 'auth/configuration-not-found') {
           title = 'Firebase Configuration Issue';
-          description = 'Registration failed. Check Email/Password sign-in in Firebase & .env file.';
+          description = 'Registration failed. This usually means Email/Password sign-in is not enabled for your Firebase project, or the Project ID in your .env file is incorrect. Please check your Firebase project settings (Authentication > Sign-in method) and verify your .env file, then restart the server.';
         } else if (error.message) {
           description = error.message;
         }
@@ -114,10 +127,18 @@ export default function RegisterDonorPage() {
           variant: 'destructive',
           title: title,
           description: description,
-          duration: 10000, 
+          duration: 10000,
         });
       }
     });
+  }
+
+  if (authLoading || currentUser) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
+        <Loader2 className="h-12 w-12 animate-spin text-accent" />
+      </div>
+    );
   }
 
   return (

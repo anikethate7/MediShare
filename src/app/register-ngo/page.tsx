@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,8 +23,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, UserPlus, Building2, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react'; 
-import React, { useTransition } from 'react';
+import { Loader2, UserPlus, Building2, Mail, KeyRound, MapPin, Phone, Globe, FileText } from 'lucide-react';
+import React, { useTransition, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ngoTypes } from '@/data/mockData';
 import type { NGO } from '@/types';
@@ -33,6 +32,8 @@ import { auth as firebaseAuth, db as firebaseDb, firebaseInitError } from '@/lib
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import Link from 'next/link';
 
 const registerNgoFormSchema = z.object({
   ngoName: z.string().min(3, 'NGO name must be at least 3 characters.').max(100, 'NGO name must not exceed 100 characters.'),
@@ -58,6 +59,19 @@ export default function RegisterNgoPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
+  const { currentUser, userRole, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (currentUser) {
+        if (userRole === 'ngo') {
+          router.push('/ngo-dashboard');
+        } else if (userRole === 'donor') {
+          router.push('/donor-dashboard');
+        }
+      }
+    }
+  }, [currentUser, userRole, authLoading, router]);
 
   const form = useForm<RegisterNgoFormValues>({
     resolver: zodResolver(registerNgoFormSchema),
@@ -99,7 +113,7 @@ export default function RegisterNgoPage() {
             address: data.address,
             city: data.city,
             description: data.description,
-            contactEmail: data.email, 
+            contactEmail: data.email,
             contactPhone: data.contactPhone,
             website: data.website,
           };
@@ -111,7 +125,7 @@ export default function RegisterNgoPage() {
             description: 'Your NGO account has been created. Please login.',
           });
           form.reset();
-          router.push('/login-ngo'); 
+          router.push('/login-ngo');
         } else {
           console.error('Registration: Firebase user object is null after successful creation call.');
           toast({
@@ -141,10 +155,18 @@ export default function RegisterNgoPage() {
           variant: 'destructive',
           title: title,
           description: description,
-          duration: 10000, 
+          duration: 10000,
         });
       }
     });
+  }
+
+  if (authLoading || currentUser) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
@@ -364,6 +386,12 @@ export default function RegisterNgoPage() {
               </Button>
             </form>
           </Form>
+           <p className="mt-4 md:mt-6 text-center text-xs md:text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <Link href="/login-ngo" className="font-medium text-primary hover:underline">
+              Login here
+            </Link>
+          </p>
         </CardContent>
       </Card>
     </div>

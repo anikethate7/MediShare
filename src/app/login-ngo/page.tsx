@@ -1,4 +1,3 @@
-
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,13 +14,14 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, LogIn, Mail, KeyRound, Building2 } from 'lucide-react'; 
-import React, { useTransition } from 'react';
+import { Loader2, LogIn, Mail, KeyRound, Building2 } from 'lucide-react';
+import React, { useTransition, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config'; 
+import { auth as firebaseAuth, firebaseInitError } from '@/lib/firebase/config';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 const loginNgoFormSchema = z.object({
   email: z.string().email('Invalid email address.'),
@@ -34,6 +34,19 @@ export default function LoginNgoPage() {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
+  const { currentUser, userRole, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (currentUser) {
+        if (userRole === 'ngo') {
+          router.push('/ngo-dashboard');
+        } else if (userRole === 'donor') {
+          router.push('/donor-dashboard');
+        }
+      }
+    }
+  }, [currentUser, userRole, authLoading, router]);
 
   const form = useForm<LoginNgoFormValues>({
     resolver: zodResolver(loginNgoFormSchema),
@@ -62,7 +75,7 @@ export default function LoginNgoPage() {
           description: 'Welcome back to MediShare.',
         });
         form.reset();
-        router.push('/ngo-dashboard'); 
+        router.push('/ngo-dashboard');
       } catch (error: any) {
         console.error('Error logging in NGO:', error);
         let description = 'Invalid email or password. Please try again.';
@@ -78,6 +91,14 @@ export default function LoginNgoPage() {
         });
       }
     });
+  }
+
+  if (authLoading || currentUser) {
+    return (
+      <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+      </div>
+    );
   }
 
   return (
